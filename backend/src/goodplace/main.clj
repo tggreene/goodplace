@@ -1,10 +1,22 @@
 (ns goodplace.main
   (:require [aero.core :as aero]
             [easy.system :as es]
+            [goodplace.shared.routes :as routes]
+            [goodplace.templates.app :refer [template]]
+            [inertia.middleware :as inertia]
             [integrant.core :as ig]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
-            [ring.adapter.jetty :as jetty]))
+            [reitit.coercion.schema :as schema-coercion]
+            [reitit.dev.pretty :as pretty]
+            [reitit.ring :as rr]
+            [reitit.ring.coercion :as rrc]
+            [reitit.ring.middleware.parameters :as params]
+            [ring.adapter.jetty :as jetty]
+            [ring.middleware.flash :refer [wrap-flash]]
+            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+            [ring.middleware.session :refer [wrap-session]]
+            [ring.middleware.session.cookie :refer [cookie-store]]))
 
 (def system nil)
 
@@ -26,10 +38,69 @@
       (log/fatal throwable "Shutting down service with Exception")
       (ig/halt! system))))
 
+(defn inertia-handler
+  [id]
+  (fn [_]
+    (inertia/render id)))
+
+(defn create-reitit-routes
+  [routes impls]
+  (reduce (fn [res {:keys [id path]}]
+            (conj res
+                  [path (get impls id)]))
+          []
+          routes))
+
+(def route-implementations
+  {:home {:get {:handler (inertia-handler :home)}}
+   :about {:get {:handler (inertia-handler :about)}}})
+
+#_
 (defn handler
   [request]
   {:status 200
    :body "OK"})
+
+(def asset-version "1")
+(def cookie-store-secret (byte-array 16))
+
+#_
+(defn wrap-inertia-share [handler db]
+  (fn [request]
+    (prn (:session request))
+    (let [user-id (-> request :session :identity :id)
+          user (db/get-user-by-id db user-id)
+          success (-> request :flash :success)
+          errors (-> request :flash :error)
+          props {:errors (or errors {})
+                 :auth {:user user}
+                 :flash {:success success
+                         :error nil}}]
+      (handler (assoc request :inertia-share props)))))
+
+(def handler
+  (reitit.ring/ring-handler
+   (reitit.ring/router
+    (create-reitit-routes routes/routes route-implementations)
+    {:conflicts nil
+     :exception pretty/exception
+     :data {:coercion schema-coercion/coercion
+            :middleware [params/parameters-middleware
+                         rrc/coerce-exceptions-middleware
+                         rrc/coerce-request-middleware
+                         rrc/coerce-response-middleware
+                         wrap-keyword-params
+                         [wrap-session {:store (cookie-store {:key cookie-store-secret})}]
+                         wrap-flash
+                         #_
+                         [bam/wrap-authentication backend]
+                         #_
+                         [wrap-inertia-share db]
+                         [inertia/wrap-inertia template asset-version]]}} )
+   (reitit.ring/routes
+    (reitit.ring/create-file-handler {:path "/"})
+    (reitit.ring/create-default-handler
+     {:not-found (constantly {:status 404})})) ))
 
 (defn apply-middleware
   [handler middleware]

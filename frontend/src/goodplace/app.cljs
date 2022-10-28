@@ -1,45 +1,81 @@
 (ns goodplace.app
   (:require
-   ["@chakra-ui/react" :refer [ChakraProvider Text]]
-   ["react-dom/client" :as rdom]
+   ["@inertiajs/inertia" :refer [Inertia]]
+   ["@inertiajs/inertia-react" :refer [createInertiaApp Head InertiaLink usePage]]
+   ["@inertiajs/progress" :refer [InertiaProgress]]
+   ["@chakra-ui/react" :refer [Box ChakraProvider Flex Heading Text]]
+   ["react" :as react]
+   ["react-dom/client" :as rdomc]
+   ["react-dom" :as rdom]
    [applied-science.js-interop :as j]
+   [goodplace.shared.routes :as routes]
    [helix.core :refer [defnc $ <>]]))
 
-(defonce root
-  (rdom/createRoot (js/document.getElementById "app")))
-
-(js/console.log "hello")
-
-(defnc something
+(defnc home
   []
-  ($ ChakraProvider
-     ($ Text "Hello World")))
+  (let [page (usePage)]
+    ($ Flex {:direction "column"
+             :justify "center"
+             :align "center"
+             :width "100%"}
+       ($ Box {:height 12})
+       ($ Box {:padding 2}
+          ($ Heading {:size "2xl"} "Home"))
+       ($ Box {}
+          ($ Text {:as "pre"} (pr-str page))))))
 
-(def pages [])
+(defnc about
+  []
+  ($ Text "About"))
+
+(def pages
+  {"home" home
+   "about" about})
+
+(defnc layout
+  [{:keys [children]}]
+  (let [pageData (usePage)]
+    ($ Flex {:direction "column"
+             :justify "center"
+             :align "center"
+             :width "100%"}
+       ($ Flex {:height 12
+                :justify "space-between"
+                :align "center"
+                :width "100%"}
+          ($ Box {:py 2
+                  :px 4}
+             ($ Text "MaybeLogo"))
+          ($ Flex {:py 2
+                   :gap 4
+                   :width "100%"}
+             ($ InertiaLink {:href "/"} "Home")
+             ($ InertiaLink {:href "/about"} "About"))
+          ($ Box {:py 2
+                  :px 4}
+             ($ Text "MaybeLogin")))
+       ($ Box children))))
 
 (defn setup-inertia
   []
   (createInertiaApp
    #js {:resolve (fn [name]
-                   (if-let [page (get pages name)]
-                     ;; We can set layouts here but may not be required for this app
-                     #_
-                     (when-not (contains? unauthenticated-pages name)
-                       (set! (.-layout comp) (fn [page] ($ layout page))))
-                     page
+                   (if-let [^js comp (get pages name)]
+                     (do
+                       (set! (.-layout comp)
+                             (j/fn [^:js page]
+                               ($ layout page)))
+                       comp)
                      (js/console.error (str "No page called " name " exists"))))
-        :title (fn [title] (str title " | Ping CRM"))
-        :setup (j/fn [^:js {:keys [el App props]}]
-                 (.render root ($ App props)))}) )
-
+        :title (constantly "Goodplace")
+        :setup
+        (j/fn [^:js {:keys [el App props]}]
+                 (let [root (rdomc/createRoot el)]
+                   (.render root ($ ChakraProvider
+                                    (react/createElement App #c props)))))}))
 
 (defn start!
   []
-  )
-
-
+  (setup-inertia))
 
 (start!)
-
-(defn init! []
-  )
