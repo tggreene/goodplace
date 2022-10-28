@@ -1,0 +1,12 @@
+**/.cpcache/
+**/.nrepl-port
+**/.shadow-cljs/
+**/node_modules/
+**/public/js/cljs-runtime/
+**/public/js/manifest.edn
+**/public/js/*.js
+**/public/js/*.map
+**/public/css/*.css
+**/public/js/report.html
+*js.map
+.cache

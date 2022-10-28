@@ -1,0 +1,27 @@
+{:deps true
+
+ :npm-deps {:install false}
+
+ :dev-http {8091 {:roots ["public"]}}
+
+ :builds
+ {:app {:target :browser
+        :modules {:app {:entries [goodplace.app]}}
+        :dev {:output-dir "public/js"
+              :closure-defines {goog.DEBUG true}
+              :compiler-options
+              {:output-feature-set :es-next}}
+        :js-options {:resolve
+                     {"babelHelpers"
+                      {:target :npm
+                       :require "@babel/helpers"}
+                      "http2" false}
+                     :js-provider :external
+                     :external-index "target/index.js"}
+
+        :compiler-options {:source-map true}
+        :release {:output-dir "target/release/app"}
+        :build-hooks [(shadow.cljs.build-report/hook)]
+        :devtools {:preloads [hashp.core
+                              hashc.core
+                              debux.cs.core]}}}}
