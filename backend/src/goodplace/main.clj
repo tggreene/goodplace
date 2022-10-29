@@ -3,6 +3,7 @@
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :as bam]
             [easy.system :as es]
+            [goodplace.handlers :as handlers]
             [goodplace.models.users :as users]
             [goodplace.shared.routes :as routes]
             [goodplace.templates.app :refer [template]]
@@ -22,22 +23,37 @@
             [ring.middleware.session.cookie :refer [cookie-store]]))
 
 (defn inertia-handler
-  [id]
-  (fn [_]
-    (inertia/render id)))
+  ([id]
+   (fn [_]
+     (inertia/render id)))
+  ([id props]
+   (fn [_]
+     (inertia/render id props))))
 
-(def route-implementations
+(comment
+  (inertia/render "something"))
+
+(defn route-implementations
+  [context]
   {:home {:get {:handler (inertia-handler :home)}}
-   :about {:get {:handler (inertia-handler :about)}}})
+   :about {:get {:handler (inertia-handler :about)}}
+   :login {:get {:handler handlers/login}}
+   :logout {:get {:handler handlers/logout}}
+   :authenticate {:post {:handler (handlers/authenticate context)}}})
+
+(defn check-route-implementations
+  []
+  (->> routes/routes
+       (remove #(contains? (route-implementations nil) (:id %)))
+       (run! #(println "No route implementation found for" (:id %)))))
 
 (def asset-version "1")
 (def cookie-store-secret (byte-array 16))
 (def backend (backends/session))
 
 (defn wrap-inertia-share
-  [handler db]
+  [handler {:keys [db] :as context}]
   (fn [request]
-    (prn (:session request))
     (let [user-id (-> request :session :identity :id)
           user (users/get-user-by-id db user-id)
           success (-> request :flash :success)
@@ -60,7 +76,7 @@
   [{:keys [db] :as context}]
   (reitit.ring/ring-handler
    (reitit.ring/router
-    (create-reitit-routes routes/routes route-implementations)
+    (create-reitit-routes routes/routes (route-implementations context))
     {:conflicts nil
      :exception pretty/exception
      :data {:coercion schema-coercion/coercion
@@ -73,7 +89,7 @@
                           {:store (cookie-store {:key cookie-store-secret})}]
                          wrap-flash
                          [bam/wrap-authentication backend]
-                         [wrap-inertia-share db]
+                         [wrap-inertia-share context]
                          [inertia/wrap-inertia template asset-version]]}} )
    (reitit.ring/routes
     (reitit.ring/create-file-handler {:path "/"})
@@ -82,13 +98,15 @@
 
 (defmethod ig/init-key ::server
   [_ {:keys [port dynamic? db] :as opts}]
-  #p db
   (log/infof "Starting Server {port: %d}" port)
-  (jetty/run-jetty
-   (if dynamic?
-     (#'handler {:db db})
-     (handler {:db db}))
-   {:port port :join? false}))
+  (let [context {:db db}]
+    (check-route-implementations context)
+    (jetty/run-jetty
+     (if dynamic?
+       (fn [request]
+         ((handler context) request))
+       (handler context))
+     {:port port :join? false})))
 
 (defmethod ig/halt-key! ::server [_ server]
   (when server

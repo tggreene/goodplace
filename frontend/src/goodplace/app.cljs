@@ -9,9 +9,12 @@
    [goodplace.shared.routes :as routes]
    [clojure.set :as set]
    [clojure.walk :as walk]
-   [potpuri.core :as potpuri]))
+   [potpuri.core :as potpuri]
+   [devtools.core]))
 
-(.init InertiaProgress)
+#_ (.init InertiaProgress)
+
+(devtools.core/install!)
 
 (def page-implementations
   {:home pages/Home
@@ -43,7 +46,7 @@
     :pages pages
     :title-fn (constantly "Goodplace")
     :root-component ChakraProvider
-    :layout-component layouts/default}))
+    :layout-component layouts/Default}))
 
 (defn start!
   []

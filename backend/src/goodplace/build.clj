@@ -1,6 +1,9 @@
 (ns goodplace.build
+  #_
   (:require [easy.builder :as eb]))
 
-#l (eb/add-system-config)
+#_
+(eb/add-system-config)
 
-#l (eb/add-logging-config)
+#_
+(eb/add-logging-config)

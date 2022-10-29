@@ -81,21 +81,21 @@
                          :from [:users]
                          :where [:= :deleted_at nil]
                          :order-by [:id]})]
-    (jdbc/execute! db query)))
+    (jdbc/execute-one! db query)))
 
 (defn get-user-by-id
   [db id]
   (let [query (h/format {:select [:*]
                          :from [:users]
                          :where [:= :id id]})]
-    (jdbc/execute! db query)))
+    (jdbc/execute-one! db query)))
 
 (defn get-user-by-email
   [db email]
   (let [query (h/format {:select [:*]
                          :from [:users]
                          :where [:= :email email]})]
-    (jdbc/execute! db query)))
+    (jdbc/execute-one! db query)))
 
 (comment
   (def temp-db (:goodplace.db/db integrant.repl.state/system))

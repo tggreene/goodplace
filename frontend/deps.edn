@@ -11,6 +11,7 @@
         ;; Dev Dependencies (these are DCEd so no harm having them here, one
         ;; less alias to juggle)
         thheller/shadow-cljs {:mvn/version "2.20.7"}
+        binaryage/devtools {:mvn/version "1.0.5"}
         cider/cider-nrepl {:mvn/version "0.28.3"}
         cider/piggieback {:mvn/version "0.5.2"}
         org.clojars.tggreene/hashp {:mvn/version "0.3.0"}

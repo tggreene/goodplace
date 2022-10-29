@@ -1,4 +1,4 @@
-(ns goodplace.handlers.authentication
+(ns goodplace.handlers.auth
   (:require [crypto.password.bcrypt :as password]
             [inertia.middleware :as inertia]
             [goodplace.models.users :as users]
@@ -9,10 +9,11 @@
   username and passwords."
   [db]
   (fn [request]
+    #p request
     (let [email (-> request :body-params :email)
           password (-> request :body-params :password)
           user (users/get-user-by-email db email)
-          sanitized-user (dissoc user :password)
+          sanitized-user #p (dissoc user :password)
           session (:session request)]
       (if (and user (password/check password (:password user)))
         (let [updated-session (assoc session :identity sanitized-user)]
@@ -22,3 +23,8 @@
             (assoc :flash
                    {:error
                     {:email "These credentials do not match our records."}}))))))
+
+(defn logout
+  [_]
+  (-> (response/redirect "/" :see-other)
+      (assoc :session nil)))
