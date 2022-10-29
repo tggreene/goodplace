@@ -1,4 +1,10 @@
 {:ig/system
  {:goodplace.main/server
   {:port #profile {:dev 8090
-                   :default 8080}}}}
+                   :default 8080}
+   :dynamic? #profile {:dev true
+                      :default false}
+   :db #ig/ref :goodplace.db/db}
+  :goodplace.db/db
+  {:db-spec {:dbtype "sqlite"
+             :dbname "resources/db/db.sqlite"}}}}

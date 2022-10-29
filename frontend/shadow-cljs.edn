@@ -7,6 +7,8 @@
  :builds
  {:app {:target :browser
         :modules {:app {:entries [goodplace.app]}}
+        :fs-watch {:hawk false}
+
         :dev {:output-dir "public/js"
               :closure-defines {goog.DEBUG true}
               :compiler-options
