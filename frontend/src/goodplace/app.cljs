@@ -1,60 +1,46 @@
 (ns goodplace.app
   (:require
    ["@inertiajs/inertia" :refer [Inertia]]
-   ["@inertiajs/inertia-react" :refer [createInertiaApp Head InertiaLink usePage]]
    ["@inertiajs/progress" :refer [InertiaProgress]]
-   ["@chakra-ui/react" :refer [Box ChakraProvider Flex Heading Text]]
-   ["react" :as react]
-   ["react-dom/client" :as rdom]
-   [applied-science.js-interop :as j]
+   ["@chakra-ui/react" :refer [ChakraProvider]]
    [goodplace.inertia :refer [create-inertia-app]]
    [goodplace.layouts :as layouts]
    [goodplace.pages :as pages]
    [goodplace.shared.routes :as routes]
-   [helix.core :refer [defnc $ <>]]
    [clojure.set :as set]
-   [clojure.walk :as walk]))
+   [clojure.walk :as walk]
+   [potpuri.core :as potpuri]))
 
 (.init InertiaProgress)
-
-(defnc home
-  []
-  (let [page (usePage)]
-    ($ Flex {:direction "column"
-             :justify "center"
-             :align "center"
-             :width "100%"}
-       ($ Box {:height 12})
-       ($ Box {:padding 2}
-          ($ Heading {:size "2xl"} "Home"))
-       ($ Box {}
-          ($ Text {:as "pre"} (pr-str page))))))
-
-(defnc login
-  []
-  (let []))
-
-(defnc about
-  []
-  ($ Text "About"))
 
 (def page-implementations
   {:home pages/Home
    :about pages/About
    :login pages/Login})
 
+(def pages
+  (reduce (fn [pages {:keys [id] :as page}]
+            (conj pages
+                  (if-let [impl (get page-implementations id)]
+                    (assoc page :impl impl)
+                    page)))
+          []
+          routes/pages))
+
+(def indexed-pages
+  (potpuri/index-by :id pages))
+
 (defn check-page-implementations!
   []
-  (->> (for [{:keys [id]} routes/pages]
-         [id (contains? page-implementations id)])
-       (filter (comp false? second))
-       (run! #(js/console.warn (str "No page implementation for " (first %))))))
+  (->> pages
+       (remove :impl)
+       (run! #(js/console.warn (str "No page implementation for " (:id %))))))
 
 (defn setup-inertia
   []
   (create-inertia-app
-   {:page-fn #(get page-implementations (keyword %))
-    :pages routes/pages
+   {:page-fn #(get-in indexed-pages [(keyword %) :impl])
+    :pages pages
     :title-fn (constantly "Goodplace")
     :root-component ChakraProvider
     :layout-component layouts/default}))

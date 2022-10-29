@@ -6,6 +6,8 @@
         funcool/promesa {:mvn/version "8.0.450"}
         lilactown/helix {:mvn/version "0.1.6"}
         goodplace/shared {:local/root "../shared"}
+        metosin/potpuri {:mvn/version "0.5.3"}
+
         ;; Dev Dependencies (these are DCEd so no harm having them here, one
         ;; less alias to juggle)
         thheller/shadow-cljs {:mvn/version "2.20.7"}
