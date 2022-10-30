@@ -1,0 +1,9 @@
+{:dev [{:name "backend"
+        :cmd "cljx -M:dev"
+        :dir "backend"}
+       {:name "frontend"
+        :cmd "npx shadow-cljs watch app"
+        :dir "frontend"}
+       {:name "webpack"
+        :cmd "npx webpack --watch"
+        :dir "frontend"}]}
