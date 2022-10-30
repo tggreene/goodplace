@@ -67,7 +67,7 @@
                          :where [:= :id id]})]
     (jdbc/execute-one! db query)))
 
-(defn hard-delete-user
+(defn hard-delete-user!
   [db id]
   (let [query (h/format {:update :users
                          :set {:deleted_at nil

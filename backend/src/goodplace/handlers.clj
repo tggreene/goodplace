@@ -59,11 +59,55 @@
           notes (notes/list-user-notes db id)]
       (inertia/render :notes {:notes notes}))))
 
-(defn create-note
-  [])
+(defn view-note
+  [{:keys [db]}]
+  (fn [request]
+    (let [{:keys [id] :as user} (get-user request)
+          note-id (get-in request [:path-params :note-id])
+          note (notes/get-note-by-id db note-id)]
+      (cond
+        (= id (:user note)) (inertia/render :view-note {:note note})
+        note (inertia/render :home {:errors ["Not permitted to view note"]
+                                    :redirect (routes/get-route-path :notes)})
+        :else (inertia/render :home {:errors ["Note not found"]
+                                     :redirect (routes/get-route-path :notes)})))))
+
+(defn edit-note-get
+  [{:keys [db]}]
+  (fn [request]
+    (let [{:keys [id] :as user} (get-user request)
+          note-id (get-in request [:path-params :note-id])
+          note (notes/get-note-by-id db note-id)]
+      (cond
+        (= id (:user note)) (inertia/render :edit-note {:note note})
+        note (inertia/render :home {:errors ["Not permitted to view note"]
+                                    :redirect (routes/get-route-path :notes)})
+        :else (inertia/render :home {:errors ["Note not found"]
+                                     :redirect (routes/get-route-path :notes)})))))
+
+(defn edit-note-post
+  [{:keys [db]}]
+  (fn [request]
+    (let [note (:body-params request)
+          _ (notes/update-note! db note)
+          new-note (notes/get-note-by-id db (:id note))]
+      (inertia/render :view-note {:note new-note}))))
+
+(defn create-note-post
+  [{:keys [db]}]
+  (fn [request]
+    (let [user (get-user request)
+          note (:body-params request)
+          {:keys [id] :as new-note} (notes/create-note! db (assoc note :user (:id user)))]
+      (response/redirect (routes/get-route-path :view-note {:note-id id}) :see-other))))
 
 (defn delete-note
-  [])
+  [{:keys [db]}]
+  (fn [request]
+    (let [user (get-user request)
+          note-id (get-in request [:path-params :note-id])]
+      (notes/soft-delete-note! db note-id)
+      (response/redirect (routes/get-route-path :notes) :see-other))))
 
 (defn get-pagination-range
   [link-count current-page page-number]
@@ -83,19 +127,17 @@
 
 (comment
   [(= (get-pagination-range 10 2 100) '(1 2 3 4 5 6 7 8 9 10))
-   (= #p (get-pagination-range 10 30 100) '(25 26 27 28 29 30 31 32 33 34))
-   (= #p (get-pagination-range 10 98 100) '(91 92 93 94 95 96 97 98 99 100))]
+   (= (get-pagination-range 10 30 100) '(25 26 27 28 29 30 31 32 33 34))
+   (= (get-pagination-range 10 98 100) '(91 92 93 94 95 96 97 98 99 100))]
 
-  #p
   (=
    [(get-pagination-range 11 2 100)
     (get-pagination-range 11 30 100)
     (get-pagination-range 11 98 100)]
    ['(1 2 3 4 5 6 7 8 9 10 11)
     '(25 26 27 28 29 30 31 32 33 34 35)
-    '(90 91 92 93 94 95 96 97 98 99 100)])
+    '(90 91 92 93 94 95 96 97 98 99 100)]))
 
-  )
 (defn pagination-links
   [uri query-string current-page total per-page]
   (let [uri (str uri

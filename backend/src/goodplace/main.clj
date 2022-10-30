@@ -20,7 +20,8 @@
             [ring.middleware.flash :refer [wrap-flash]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.session :refer [wrap-session]]
-            [ring.middleware.session.cookie :refer [cookie-store]]))
+            [ring.middleware.session.cookie :refer [cookie-store]]
+            [jsonista.core :as json]))
 
 (defn inertia-handler
   ([id]
@@ -36,12 +37,17 @@
 (defn route-implementations
   [context]
   {:home {:get {:handler (inertia-handler :home)}}
-   :about {:get {:handler (inertia-handler :about)}}
    :login {:get {:handler handlers/login}
            :post {:handler (handlers/authenticate context)}}
    :logout {:get {:handler handlers/logout}}
    :authenticate {:post {:handler (handlers/authenticate context)}}
    :notes {:get {:handler (handlers/notes context)}}
+   :view-note {:get {:handler (handlers/view-note context)}}
+   :edit-note {:get {:handler (handlers/edit-note-get context)}
+               :post {:handler (handlers/edit-note-post context)}}
+   :create-note {:get {:handler (inertia-handler :create-note)}
+                 :post {:handler (handlers/create-note-post context)}}
+   :delete-note {:delete {:handler (handlers/delete-note context)}}
    :cities {:get {:handler (handlers/cities context)}}})
 
 (defn check-route-implementations
@@ -97,7 +103,12 @@
    (reitit.ring/routes
     (reitit.ring/create-file-handler {:path "/"})
     (reitit.ring/create-default-handler
-     {:not-found (constantly {:status 404})})) ))
+     {:not-found
+      (->
+       (fn [request]
+         (inertia/render :something-wrong {:errors ["Page not found"]
+                                           :redirect (routes/get-route-path :home)}))
+       (inertia/wrap-inertia template asset-version))}))))
 
 (defmethod ig/init-key ::server
   [_ {:keys [port dynamic? db] :as opts}]

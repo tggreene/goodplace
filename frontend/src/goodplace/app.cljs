@@ -21,7 +21,11 @@
    :about pages/About
    :login pages/Login
    :notes pages/Notes
-   :cities pages/Cities})
+   :view-note pages/ViewNote
+   :edit-note pages/EditNote
+   :create-note pages/CreateNote
+   :cities pages/Cities
+   :something-wrong pages/SomethingWrong})
 
 (def pages
   (reduce (fn [pages {:keys [id] :as page}]

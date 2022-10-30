@@ -1,4 +1,5 @@
-(ns goodplace.shared.routes)
+(ns goodplace.shared.routes
+  (:require [clojure.string :as str]))
 
 (defn -index-by
   [f col]
@@ -7,15 +8,25 @@
           {}
           col))
 
+;; {:id :home          - id used to refer to route
+;;  :path "/"          - url path for resource
+;;  :name "Home"       - Name of route used as a referent in the App
+;;  :title "GoodPlace" - Title of route (or page typically) for display in app
+;;  :page? true        - Whether route represents a page which should have a component
+;;  :nav? true         - Whether a page should show in app nav
+;;  }
+
 (def routes
   [{:id :home
     :path "/"
     :name "Home"
     :title "GoodPlace"
-    :page? true}
-   {:id :about
-    :path "/about"
-    :name "About"
+    :page? true
+    :nav? true}
+   {:id :something-wrong
+    :path "/oops"
+    :name "Something Wrong"
+    :title "Something Went Wrong"
     :page? true}
    {:id :login
     :path "/login"
@@ -32,12 +43,40 @@
    {:id :notes
     :path "/notes"
     :name "Notes"
+    :title "Notes"
+    :page? true
+    :nav? true
+    :authenticated? true}
+   {:id :view-note
+    :path "/notes/:note-id"
+    :name "View Note"
+    :title "View Note"
+    :page? true
+    :authenticated? true}
+   {:id :edit-note
+    :path "/notes/:note-id/edit"
+    :name "Edit Note"
+    :title "Edit Note"
+    :page? true
+    :authenticated? true}
+   {:id :create-note
+    :path "/create-note"
+    :name "Create Note"
+    :title "Create Note"
+    :page? true
+    :authenticated? true}
+   {:id :delete-note
+    :path "/notes/:note-id/delete"
+    :name "Delete Note"
+    :title "Delete Note"
     :page? true
     :authenticated? true}
    {:id :cities
     :path "/cities"
     :name "Cities"
+    :title "Cities"
     :page? true
+    :nav? true
     :authenticated? true}])
 
 (def pages
@@ -50,11 +89,29 @@
   (-index-by :id pages))
 
 (defn get-route
-  [id]
-  (get indexed-routes id))
+  ([id]
+   (get indexed-routes id))
+  ([id params]
+   (some-> indexed-routes
+           (get id)
+           (update :path #(reduce (fn [path [param value]]
+                                    (str/replace path (str param) value))
+                                  %
+                                  params)))))
 
-(def get-route-path
-  (comp :path get-route))
+(defn get-route-path
+  ([id]
+   (:path (get-route id)))
+  ([id params]
+   (:path (get-route id params))))
+
+(comment
+  (get-route-path :view-note)
+  (get-route-path :view-note {:note-id "abcdefg"})
+
+  (get-route :view-note {:note-id "abcdefg"})
+
+  )
 
 (defn check-routes
   [routes]

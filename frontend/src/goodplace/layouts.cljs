@@ -55,37 +55,9 @@
 (defn filter-pages
   [{:keys [user]} pages]
   (cond->> pages
+    :always (filter :nav?)
     user (remove #(= :login (:id %)))
     (not user) (remove :authenticated?)))
-
-#_
-(defnc NavigationMenu
-  [{:keys [user pages menuOpen]}]
-  (let [pages (filter-pages {:user user} pages)]
-    ($ Slide {:direction "left"
-              :in menuOpen
-              :style #js {:left 0
-                          :top "var(--chakra-sizes-12)"
-                          :height "100%"
-                          :position "absolute"}}
-       ($ Box {:height "max(100%, 100vh)"
-               :width "xs"
-               :borderRightWidth 1
-               :borderRightColor "gray.100"
-               :borderRightStyle "solid"
-               :boxShadow "xs"
-               :position "relative"
-               :bg "white"}
-          ($ Flex {:direction "column"
-                   :py 6
-                   :px 8
-                   :gap 4
-                   :position "relative"}
-             (for [{:keys [id path name]} #c pages]
-               ($ InertiaLink {:as "span"
-                               :key id
-                               :href path}
-                  ($ Link name))))))))
 
 (defnc NavigationMenu
   [{:keys [user pages menuOpen]}]
@@ -94,8 +66,10 @@
               :in menuOpen
               :style #js {:left 0
                           :top top-bar-height-var
-                          :height "100%"
-                          :position "absolute"}}
+                          :width "var(--chakra-sizes-xs)"
+                          :height "max(100%, 100vh)"
+                          :position "absolute"
+                          :zIndex 10}}
        ($ Flex {:height "max(100%, 100vh)"
                 :width "xs"
                 :borderRightWidth 1
@@ -106,9 +80,8 @@
                 :direction "column"
                 :py 6
                 :px 8
-                :gap 4
-                :zIndex 10}
-          (for [{:keys [id path name]} #c pages]
+                :gap 4}
+          (for [{:keys [id path name]} pages]
             ($ InertiaLink {:as "span"
                             :key id
                             :href path}
