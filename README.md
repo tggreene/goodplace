@@ -6,6 +6,12 @@ with ChakraUI as the UI framework.
 Leaning away from closure compiler for JS assets as it grows more incompatible
 and lags further behind.
 
+## Todo
+
+- [ ] Add easy running of cljs, js parts
+- [ ] Add components to wrap inertia links, buttons
+- [ ] Reimplement cljs friendly hooks for inertia
+
 ## Adding a new page or route
 
 1) Add it to `goodplace.shared.routes`
