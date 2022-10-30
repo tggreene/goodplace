@@ -126,7 +126,7 @@
        {:title "Login"}
        ($ "form" {:on-submit
                   #(do (.preventDefault %)
-                       (post (:path (routes/get-route :authenticate))))}
+                       (post (routes/get-route-path :login)))}
           ($ Flex {:direction "column"
                    :p 2
                    :gap 2
@@ -202,7 +202,8 @@
              ($ Button "Back To Notes"))
           ($ InertiaLink {:href (routes/get-route-path :edit-note {:note-id id})}
              ($ Button {:colorScheme "blue"} "Edit Note"))
-          ($ InertiaLink {:href (routes/get-route-path :delete-note {:note-id id})
+          ($ InertiaLink {:as "span"
+                          :href (routes/get-route-path :delete-note {:note-id id})
                           :method "delete"}
              ($ Button {:colorScheme "red"} "Delete Note"))))))
 
@@ -311,3 +312,53 @@
                    (j/lookup))]
     ($ PageTemplate {:title "Cities"}
        ($ CitiesTable {:cities cities}))))
+
+(defnc UsersTable
+  [{:keys [users]}]
+  (let [{:keys [data links current_page]} users]
+    ($ VStack {:gap 4}
+       ($ Box {:width "100%"
+               :px 6}
+          ($ Button {:colorScheme "blue"} "Create User"))
+       ($ TableContainer
+          ($ Table {:variant "simple"}
+             ($ Thead
+                ($ Tr
+                   ($ Th {:minWidth "xs"} "Name")
+                   ($ Th {:minWidth "xs"} "Email")
+                   ($ Th "Created")
+                   ($ Th "Actions")))
+             ($ Tbody
+                (for [user data
+                      :let [{:keys [first_name last_name email created_at]}
+                            (j/lookup user)
+                            name (str first_name " " last_name)]]
+                  ($ Tr {:key email}
+                     ($ Td name)
+                     ($ Td email)
+                     ($ Td created_at)
+                     ($ Td
+                        ($ HStack
+                           ($ Button {:colorScheme "blue"
+                                      :size "sm"}
+                              "Edit User")
+                           ($ Button {:colorScheme "red"
+                                      :size "sm"}
+                              "Delete User"))))))))
+       ($ HStack
+          (for [link links
+                :let [{:keys [url label active]} (j/lookup link)]]
+            ($ InertiaLink {:key (str url label)
+                            :href url}
+               (let [props (cond-> {:minWidth 14}
+                             active (merge {:colorScheme "blue"})
+                             (not url) (merge {:disabled true}))]
+                 ($ Button {:& props} label))))))))
+
+(defnc Users
+  []
+  (let [users (-> (usePage)
+                   (j/get-in [:props :users])
+                   (j/lookup))]
+    ($ PageTemplate {:title "Users"}
+       ($ UsersTable {:users users}))))

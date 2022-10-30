@@ -77,7 +77,7 @@
 
 (defn list-users
   [db]
-  (let [query (h/format {:select [:id :first_name]
+  (let [query (h/format {:select [:id :first_name :last_name :email :created_at]
                          :from [:users]
                          :where [:= :deleted_at nil]
                          :order-by [:id]})]

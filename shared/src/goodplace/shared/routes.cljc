@@ -1,17 +1,6 @@
 (ns goodplace.shared.routes
   (:require [clojure.string :as str]))
 
-(defn -index-by
-  [f col]
-  (reduce (fn [res item]
-            (assoc res (f item) item))
-          {}
-          col))
-
-(defn -find-first
-  [pred col]
-  (first (filter pred col)))
-
 ;; {:id :home          - id used to refer to route
 ;;  :path "/"          - url path for resource
 ;;  :name "Home"       - Name of route used as a referent in the App
@@ -27,11 +16,13 @@
     :title "GoodPlace"
     :page? true
     :nav? true}
+
    {:id :something-wrong
     :path "/oops"
     :name "Something Wrong"
     :title "Something Went Wrong"
     :page? true}
+
    {:id :login
     :path "/login"
     :name "Login"
@@ -41,9 +32,41 @@
     :path "/logout"
     :name "Logout"
     :title "Logout"}
-   {:id :authenticate
-    :path "/authenticate"
-    :name "Authenticate"}
+
+   ;; Users
+   {:id :users
+    :path "/users"
+    :name "Users"
+    :title "Users"
+    :page? true
+    :nav? true
+    :authenticated? true}
+   {:id :view-user
+    :path "/users/:user-id"
+    :name "View User"
+    :title "View User"
+    :page? true
+    :authenticated? true}
+   {:id :edit-user
+    :path "/users/:user-id/edit"
+    :name "Edit User"
+    :title "Edit User"
+    :page? true
+    :authenticated? true}
+   {:id :create-user
+    :path "/create-user"
+    :name "Create User"
+    :title "Create User"
+    :page? true
+    :authenticated? true}
+   {:id :delete-user
+    :path "/users/:user-id/delete"
+    :name "Delete User"
+    :title "Delete User"
+    :page? true
+    :authenticated? true}
+
+   ;; Notes
    {:id :notes
     :path "/notes"
     :name "Notes"
@@ -75,6 +98,8 @@
     :title "Delete Note"
     :page? true
     :authenticated? true}
+
+   ;; Cities
    {:id :cities
     :path "/cities"
     :name "Cities"
@@ -82,6 +107,17 @@
     :page? true
     :nav? true
     :authenticated? true}])
+
+(defn -index-by
+  [f col]
+  (reduce (fn [res item]
+            (assoc res (f item) item))
+          {}
+          col))
+
+(defn -find-first
+  [pred col]
+  (first (filter pred col)))
 
 (def pages
   (filter :page? routes))

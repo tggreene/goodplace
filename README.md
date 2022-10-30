@@ -12,6 +12,7 @@ and lags further behind.
 - [x] Add authentication for routes
 - [ ] Add user management
 - [ ] Add authorization for routes
+- [ ] Improve appearance of side menu
 - [ ] Add individual pages for server errors
 - [ ] Add components to wrap inertia links, buttons
 - [ ] Separate handlers into namespaces

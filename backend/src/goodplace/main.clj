@@ -41,7 +41,15 @@
    :login {:get {:handler handlers/login}
            :post {:handler (handlers/authenticate context)}}
    :logout {:get {:handler handlers/logout}}
-   :authenticate {:post {:handler (handlers/authenticate context)}}
+
+   :users {:get {:handler (handlers/users context)}}
+   :view-user {:get {:handler (handlers/view-user context)}}
+   :edit-user {:get {:handler (handlers/edit-user-get context)}
+               :post {:handler (handlers/edit-user-post context)}}
+   :create-user {:get {:handler (inertia-handler :create-user)}
+                 :post {:handler (handlers/create-user-post context)}}
+   :delete-user {:delete {:handler (handlers/delete-user context)}}
+
    :notes {:get {:handler (handlers/notes context)}}
    :view-note {:get {:handler (handlers/view-note context)}}
    :edit-note {:get {:handler (handlers/edit-note-get context)}
