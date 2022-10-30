@@ -37,14 +37,16 @@
   [context]
   {:home {:get {:handler (inertia-handler :home)}}
    :about {:get {:handler (inertia-handler :about)}}
-   :login {:get {:handler handlers/login}}
+   :login {:get {:handler handlers/login}
+           :post {:handler (handlers/authenticate context)}}
    :logout {:get {:handler handlers/logout}}
-   :authenticate {:post {:handler (handlers/authenticate context)}}})
+   :authenticate {:post {:handler (handlers/authenticate context)}}
+   :notes {:get {:handler (handlers/notes context)}}})
 
 (defn check-route-implementations
-  []
+  [context]
   (->> routes/routes
-       (remove #(contains? (route-implementations nil) (:id %)))
+       (remove #(contains? (route-implementations context) (:id %)))
        (run! #(println "No route implementation found for" (:id %)))))
 
 (def asset-version "1")

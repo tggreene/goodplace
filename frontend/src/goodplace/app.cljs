@@ -19,7 +19,8 @@
 (def page-implementations
   {:home pages/Home
    :about pages/About
-   :login pages/Login})
+   :login pages/Login
+   :notes pages/Notes})
 
 (def pages
   (reduce (fn [pages {:keys [id] :as page}]

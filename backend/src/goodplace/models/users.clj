@@ -81,7 +81,7 @@
                          :from [:users]
                          :where [:= :deleted_at nil]
                          :order-by [:id]})]
-    (jdbc/execute-one! db query)))
+    (jdbc/execute! db query)))
 
 (defn get-user-by-id
   [db id]

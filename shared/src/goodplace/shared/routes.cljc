@@ -20,18 +20,20 @@
    {:id :login
     :path "/login"
     :name "Login"
-    :title "Sign In"
+    :title "Login"
     :page? true}
    {:id :logout
     :path "/logout"
     :name "Logout"
     :title "Logout"}
-   {:id :login-post
-    :path "/api/login"
-    :name "Login Post"}
    {:id :authenticate
     :path "/authenticate"
-    :name "Authenticate"}])
+    :name "Authenticate"}
+   {:id :notes
+    :path "/notes"
+    :name "Notes"
+    :page? true
+    :authenticated? true}])
 
 (def pages
   (filter :page? routes))

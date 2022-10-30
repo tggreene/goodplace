@@ -1,28 +1,30 @@
 {:paths ["src" "resources"]
  :deps
- {org.clojure/clojure {:mvn/version "1.11.1"},
+ {org.clojure/clojure {:mvn/version "1.11.1"}
   goodplace/shared {:local/root "../shared"}
-  crypto-password/crypto-password {:mvn/version "0.3.0"},
-  com.github.tggreene/easy.builder {:local/root "../../easy.builder"},
-  com.github.tggreene/easy.system {:local/root "../../easy.system"},
-  ring/ring-jetty-adapter {:mvn/version "1.9.5"},
-  com.github.seancorfield/honeysql {:mvn/version "2.3.911"},
-  aero/aero {:mvn/version "1.1.6"},
-  integrant/integrant {:mvn/version "0.8.0"},
+  crypto-password/crypto-password {:mvn/version "0.3.0"}
+  com.github.tggreene/easy.builder {:local/root "../../easy.builder"}
+  com.github.tggreene/easy.system {:local/root "../../easy.system"}
+  ring/ring-jetty-adapter {:mvn/version "1.9.5"}
+  com.github.seancorfield/honeysql {:mvn/version "2.3.911"}
+  aero/aero {:mvn/version "1.1.6"}
+  integrant/integrant {:mvn/version "0.8.0"}
   metosin/potpuri {:mvn/version "0.5.3"}
-  hiccup/hiccup {:mvn/version "2.0.0-alpha2"},
-  com.github.seancorfield/next.jdbc {:mvn/version "1.2.790"},
-  com.github.prestancedesign/inertia-clojure {:mvn/version "0.2.5"},
-  prismatic/schema {:mvn/version "1.3.5"},
-  buddy/buddy-auth {:mvn/version "3.0.323"},
-  org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"},
-  funcool/struct {:mvn/version "1.4.0"},
-  metosin/reitit {:mvn/version "0.5.18"},}
+  hiccup/hiccup {:mvn/version "2.0.0-alpha2"}
+  com.github.seancorfield/next.jdbc {:mvn/version "1.2.790"}
+  com.github.prestancedesign/inertia-clojure {:mvn/version "0.2.5"}
+  prismatic/schema {:mvn/version "1.3.5"}
+  buddy/buddy-auth {:mvn/version "3.0.323"}
+  org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"}
+  funcool/struct {:mvn/version "1.4.0"}
+  metosin/reitit {:mvn/version "0.5.18"}}
 
  :aliases
  {:dev
   {:extra-paths ["dev/src"]
-   :extra-deps {integrant/repl {:mvn/version "0.3.2"}}
+   :extra-deps {integrant/repl {:mvn/version "0.3.2"}
+                tggreene/integrant-repl-autoreload
+                {:local/root "../../integrant-repl-autoreload"}}
    :main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace.dev/go)"]
    :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]}
   :run {:main-opts ["-m" "goodplace.main"]}

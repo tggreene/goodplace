@@ -2,6 +2,7 @@
   (:require
    [easy.system :as es]
    [integrant.repl :as igr]
+   [integrant-repl-autoreload.core :as igr-auto]
    [integrant.repl.state :as state]))
 
 (igr/set-prep!
@@ -19,5 +20,9 @@
   (reset)
 
   (halt)
+
+  (igr-auto/start-auto-reset)
+
+  (igr-auto/stop-auto-reset)
 
   )

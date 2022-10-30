@@ -3,7 +3,15 @@
             [inertia.middleware :as inertia]
             [goodplace.models.users :as users]
             [ring.util.response :as response]
-            [goodplace.shared.routes :as routes]))
+            [goodplace.shared.routes :as routes]
+            [goodplace.models.notes :as notes]))
+
+
+(defn get-user
+  [request]
+  (some-> request
+          :session
+          :identity))
 
 (defn authenticated?
   [request]
@@ -21,7 +29,7 @@
     (let [email (-> request :body-params :email)
           password (-> request :body-params :password)
           user (users/get-user-by-email db email)
-          sanitized-user #p (dissoc user :password)
+          sanitized-user (dissoc user :password)
           session (:session request)]
       (if (and user (password/check password (:password user)))
         (let [updated-session (assoc session :identity sanitized-user)]
@@ -42,3 +50,16 @@
   [_]
   (-> (response/redirect "/" :see-other)
       (assoc :session nil)))
+
+(defn notes
+  [{:keys [db]}]
+  (fn [request]
+    (let [{:keys [id] :as user} (get-user request)
+          notes #p (notes/list-user-notes db id)]
+      (inertia/render :notes {:notes notes}))))
+
+(defn create-note
+  [])
+
+(defn delete-note
+  [])

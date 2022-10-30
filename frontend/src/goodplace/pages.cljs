@@ -9,7 +9,8 @@
 
 (defnc JsObjectBlock
   [{:keys [object]}]
-  ($ Text {:as "pre"}
+  ($ Text {:maxWidth "md"
+           :as "pre"}
      (-> object
          (js->clj :keywordize-keys true)
          pprint
@@ -26,7 +27,7 @@
        ($ Box {:p 4}
           ($ Heading {:size "2xl"} title))
        children
-       ($ Box
+       ($ Box {:mt 10}
           ($ JsObjectBlock {:object page})) )))
 
 (defnc Home
@@ -66,14 +67,37 @@
                ($ Box {:p 4
                        :bg "red.50"
                        :borderRadius 6}
-                  #_
-                  {:p 4
-                       :borderColor "red.100"
-                       :borderWidth 2
-                       :borderRadius 6}
                   (for [error (vals errors)]
                     ($ Text {:color "red.500"} error)))))))))
 
 (defnc About
   []
   ($ PageTemplate {:title "About"}))
+
+(defn truncate-ellipsis
+  ([s]
+   (truncate-ellipsis s 200))
+  ([s max]
+   (let [length (count s)]
+     (if (< length max)
+       s
+       (str (subs s 0 max) "...")))))
+
+(defnc Note
+  [note]
+  (let [{:keys [id title contents]} note]
+    ($ Flex {:key id
+             :direction "column"
+             :gap 1
+             :width "xl"
+             :bg "gray.50"
+             :borderRadius 6
+             :p 4}
+       ($ Text {:fontWeight "bold"} title)
+       ($ Text (truncate-ellipsis contents)))))
+
+(defnc Notes
+  []
+  (let [notes (j/get-in (usePage) [:props :notes])]
+    ($ PageTemplate {:title "Notes"}
+       (map Note notes))))
