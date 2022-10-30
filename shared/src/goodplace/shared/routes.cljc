@@ -8,6 +8,10 @@
           {}
           col))
 
+(defn -find-first
+  [pred col]
+  (first (filter pred col)))
+
 ;; {:id :home          - id used to refer to route
 ;;  :path "/"          - url path for resource
 ;;  :name "Home"       - Name of route used as a referent in the App
@@ -98,18 +102,23 @@
                                     (str/replace path (str param) value))
                                   %
                                   params)))))
-
 (defn get-route-path
   ([id]
    (:path (get-route id)))
   ([id params]
    (:path (get-route id params))))
 
+(defn get-route-by-path
+  [path]
+  (-find-first #(= path (:path %)) routes))
+
 (comment
   (get-route-path :view-note)
   (get-route-path :view-note {:note-id "abcdefg"})
 
   (get-route :view-note {:note-id "abcdefg"})
+
+  (get-route-by-path "/")
 
   )
 

@@ -8,8 +8,14 @@ and lags further behind.
 
 ## Todo
 
-- [ ] Add easy running of cljs, js parts
+- [x] Add easy running of cljs, js parts
+- [x] Add authentication for routes
+- [ ] Add user management
+- [ ] Add authorization for routes
+- [ ] Add individual pages for server errors
 - [ ] Add components to wrap inertia links, buttons
+- [ ] Separate handlers into namespaces
+- [ ] Separate pages into namespaces
 - [ ] Reimplement cljs friendly hooks for inertia
 
 ## Adding a new page or route

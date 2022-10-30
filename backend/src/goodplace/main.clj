@@ -4,6 +4,7 @@
             [buddy.auth.middleware :as bam]
             [easy.system :as es]
             [goodplace.handlers :as handlers]
+            [goodplace.middleware :as mw]
             [goodplace.models.users :as users]
             [goodplace.shared.routes :as routes]
             [goodplace.templates.app :refer [template]]
@@ -98,6 +99,7 @@
                           {:store (cookie-store {:key cookie-store-secret})}]
                          wrap-flash
                          [bam/wrap-authentication backend]
+                         mw/wrap-auth
                          [wrap-inertia-share context]
                          [inertia/wrap-inertia template asset-version]]}} )
    (reitit.ring/routes
