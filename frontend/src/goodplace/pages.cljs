@@ -32,7 +32,6 @@
        ($ Box {:p 4}
           ($ Heading {:size "2xl"} title))
        children
-       #_
        ($ Box {:mt 10}
           ($ JsObjectBlock {:object page})) )))
 
@@ -244,9 +243,7 @@
 
 (defnc CreateNote
   []
-  (let [{:keys [id title contents] :as note}
-        (j/lookup (j/get-in (usePage) [:props :note]))
-        {:keys [data setData errors post processing]}
+  (let [{:keys [data setData errors post processing]}
         (j/lookup (useForm #js {:title ""
                                 :contents ""}))]
     ($ "form" {:onSubmit
@@ -319,7 +316,8 @@
     ($ VStack {:gap 4}
        ($ Box {:width "100%"
                :px 6}
-          ($ Button {:colorScheme "blue"} "Create User"))
+          ($ InertiaLink {:href (routes/get-route-path :create-user)}
+             ($ Button {:colorScheme "blue"} "Create User")))
        ($ TableContainer
           ($ Table {:variant "simple"}
              ($ Thead
@@ -362,3 +360,66 @@
                    (j/lookup))]
     ($ PageTemplate {:title "Users"}
        ($ UsersTable {:users users}))))
+
+(defnc CreateUser
+  []
+  (let [{:keys [data setData errors post processing]}
+        (j/lookup (useForm #js {:first_name ""
+                                :last_name ""
+                                :username ""
+                                :email ""
+                                :password ""
+                                :password2 ""}))
+        errors (js->clj errors)]
+    ($ PageTemplate {:title "Create User"}
+       ($ "form" {:onSubmit
+                  #(do (.preventDefault %)
+                       (post (routes/get-route-path :create-user)))}
+          ($ Flex {:direction "column"
+                   :gap 4
+                   :width "2xl"
+                   :p 4}
+             ($ FormControl
+                ($ FormLabel "First Name")
+                ($ Input {:type "text"
+                          :value (.-first_name data)
+                          :onChange #(setData "first_name" (.. % -target -value))}))
+             ($ FormControl
+                ($ FormLabel "Last Name")
+                ($ Input {:type "text"
+                          :value (.-last_name data)
+                          :onChange #(setData "last_name" (.. % -target -value))}))
+             ($ FormControl
+                ($ FormLabel "Username")
+                ($ Input {:type "text"
+                          :value (.-username data)
+                          :onChange #(setData "username" (.. % -target -value))}))
+             ($ FormControl
+                ($ FormLabel "Email")
+                ($ Input {:type "text"
+                          :value (.-email data)
+                          :onChange #(setData "email" (.. % -target -value))}))
+             ($ FormControl
+                ($ FormLabel "Password")
+                ($ Input {:type "password"
+                          :value (.-password data)
+                          :onChange #(setData "password" (.. % -target -value))}))
+             ($ FormControl
+                ($ FormLabel "Re-type Password")
+                ($ Input {:type "password"
+                          :value (.-password2 data)
+                          :onChange #(setData "password2" (.. % -target -value))}))
+             (when (not-empty errors)
+               ($ Box {:p 4
+                       :bg "red.50"
+                       :borderRadius 6
+                       :minWidth "md"}
+                  (for [error (vals errors)]
+                    ($ Text {:color "red.500"} error))))
+             ($ HStack {:mt 4}
+                ($ InertiaLink {:href (routes/get-route-path :users)}
+                   ($ Button "Back To Users"))
+                ($ Button {:type "submit"
+                           :colorScheme "blue"}
+                   "Submit"))))
+       )))

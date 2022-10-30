@@ -122,13 +122,26 @@
           new-user (users/get-user-by-id db (:id user))]
       (inertia/render :view-user {:user new-user}))))
 
+(defn check-passwords-match
+  [{:keys [password password2]}]
+  (= password password2))
+
+(defn sanitize-create-user
+  [user]
+  (dissoc user :password2))
+
 (defn create-user-post
   [{:keys [db]}]
   (fn [request]
-    (let [user (get-user request)
-          user (:body-params request)
-          {:keys [id] :as new-user} (users/create-user! db (assoc user :user (:id user)))]
-      (response/redirect (routes/get-route-path :view-user {:user-id id}) :see-other))))
+    (let [user (:body-params request)]
+      (if (check-passwords-match user)
+        (do
+          (users/create-user! db (sanitize-create-user user))
+          (response/redirect (routes/get-route-path :users) :see-other))
+        (-> (response/redirect (routes/get-route-path :create-user))
+            (assoc :flash
+                   {:error
+                    {:password "Passwords don't match"}}))))))
 
 (defn delete-user
   [{:keys [db]}]
