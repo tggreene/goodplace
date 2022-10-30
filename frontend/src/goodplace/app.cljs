@@ -20,7 +20,8 @@
   {:home pages/Home
    :about pages/About
    :login pages/Login
-   :notes pages/Notes})
+   :notes pages/Notes
+   :cities pages/Cities})
 
 (def pages
   (reduce (fn [pages {:keys [id] :as page}]

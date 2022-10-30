@@ -33,6 +33,11 @@
     :path "/notes"
     :name "Notes"
     :page? true
+    :authenticated? true}
+   {:id :cities
+    :path "/cities"
+    :name "Cities"
+    :page? true
     :authenticated? true}])
 
 (def pages
@@ -50,3 +55,15 @@
 
 (def get-route-path
   (comp :path get-route))
+
+(defn check-routes
+  [routes]
+  (let [ids (map :id routes)
+        unique? (= (count ids) (count (set ids)))]
+    {:unique? unique?}))
+
+(comment
+  ;; Check ids are unique
+  (check-routes routes)
+
+  )

@@ -15,5 +15,7 @@ and lags further behind.
       2) add a join to your new component via `page-implementations` in `goodplace.app`'
       3) add an entry to `route-implementations` for the same id, it can just
       use `(inertia-handler <id>)`
+    * For a page and a route you can follow the steps for a page but add
+      different handling on the different methods
 3) Inertia caches components so you'll need to refresh to see changes
 

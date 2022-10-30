@@ -41,7 +41,8 @@
            :post {:handler (handlers/authenticate context)}}
    :logout {:get {:handler handlers/logout}}
    :authenticate {:post {:handler (handlers/authenticate context)}}
-   :notes {:get {:handler (handlers/notes context)}}})
+   :notes {:get {:handler (handlers/notes context)}}
+   :cities {:get {:handler (handlers/cities context)}}})
 
 (defn check-route-implementations
   [context]

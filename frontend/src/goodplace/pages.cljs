@@ -1,6 +1,8 @@
 (ns goodplace.pages
   (:require
-   ["@chakra-ui/react" :refer [Box Flex Heading Button Text Input]]
+   ["@chakra-ui/react" :refer [Box Flex Heading Button Container Text Input Table Thead
+                               Tbody Tfoot Tr Th Td TabelCaption TableContainer
+                               Stack HStack VStack]]
    ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage useForm]]
    [helix.core :refer [defnc $ <>]]
    [goodplace.shared.routes :as routes]
@@ -72,7 +74,14 @@
 
 (defnc About
   []
-  ($ PageTemplate {:title "About"}))
+  ($ PageTemplate {:title "About"}
+     ($ Container
+        "GoodPlace is about getting a good place to start a product or tool with
+        a relatively simple architecture and good enough performance. There are
+        tons of tradeoffs within all of which will shed some people's interest,
+        but that's okay. I think there's enough in here to remain interesting
+        and I've been delighted by how easy it can be to add routes, pages and
+        new functionality")))
 
 (defn truncate-ellipsis
   ([s]
@@ -101,3 +110,41 @@
   (let [notes (j/get-in (usePage) [:props :notes])]
     ($ PageTemplate {:title "Notes"}
        (map Note notes))))
+
+(defnc CitiesTable
+  [{:keys [cities]}]
+  (let [{:keys [data links current_page]} cities]
+    ($ VStack
+       ($ TableContainer
+          ($ Table {:variant "simple"}
+             ($ Thead
+                ($ Tr
+                   ($ Th {:minWidth "md"} "City")
+                   ($ Th "Country")
+                   ($ Th "Latitude")
+                   ($ Th "Longitude")))
+             ($ Tbody
+                (for [city data
+                      :let [{:keys [name country lat lng]} (j/lookup city)]]
+                  ($ Tr {:key (str name "-" lat "-" lng)}
+                     ($ Td name)
+                     ($ Td country)
+                     ($ Td lat)
+                     ($ Td lng))))))
+       ($ HStack
+          (for [link links
+                :let [{:keys [url label active]} (j/lookup link)]]
+            ($ InertiaLink {:key (str url label)
+                            :href url}
+               (let [props (cond-> {:minWidth 14}
+                             active (merge {:colorScheme "blue"})
+                             (not url) (merge {:disabled true}))]
+                 ($ Button {:& props} label))))))))
+
+(defnc Cities
+  []
+  (let [cities (-> (usePage)
+                   (j/get-in [:props :cities])
+                   (j/lookup))]
+    ($ PageTemplate {:title "Cities"}
+       ($ CitiesTable {:cities cities}))))
