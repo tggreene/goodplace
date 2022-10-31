@@ -12,12 +12,15 @@ and lags further behind.
 - [x] Add authentication for routes
 - [x] Add basic tests
 - [x] Add user management
-- [ ] Reimplement cljs friendly hooks for inertia
-- [ ] Add authorization for routes
+- [x] Reimplement cljs friendly hooks for inertia
+- [x] Fork out inertia wrapping into new library
+- [x] Add titles to pages
+- [ ] Produce jar of application
+- [ ] Deployment (fly.io)
 - [ ] Improve error feedback development time
+- [ ] Add authorization for routes
 - [ ] Maybe do more to split development time dependencies
 - [ ] CI (Github Actions)
-- [ ] Deployment (fly.io)
 - [ ] Improve tests
 - [ ] Improve appearance of side menu
 - [ ] Add individual pages for server errors

@@ -9,11 +9,10 @@
   username and passwords."
   [db]
   (fn [request]
-    #p request
     (let [email (-> request :body-params :email)
           password (-> request :body-params :password)
           user (users/get-user-by-email db email)
-          sanitized-user #p (dissoc user :password)
+          sanitized-user (dissoc user :password)
           session (:session request)]
       (if (and user (password/check password (:password user)))
         (let [updated-session (assoc session :identity sanitized-user)]

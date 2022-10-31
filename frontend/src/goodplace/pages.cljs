@@ -439,35 +439,13 @@
                                    (post (routes/get-route-path :create-user)))
                     :errors errors}))))
 
-#_
-(defnc EditUser
-  []
-  (let [{:keys [id first_name last_name username email password]}
-        (-> (usePage)
-            (j/get-in [:props :user])
-            (j/lookup))
-        {:keys [data setData errors post processing]}
-        (j/lookup #c (useForm #js {:first_name first_name
-                                   :last_name last_name
-                                   :username username
-                                   :email email
-                                   :password ""
-                                   :password2 ""}))
-        errors (js->clj errors)]
-    ($ PageTemplate {:title "Edit User"}
-       ($ UserForm {:data data
-                    :setData setData
-                    :onSubmit #(do (.preventDefault %)
-                                   (post (routes/get-route-path :edit-user {:user-id id})))
-                    :errors errors}))))
-
 (defnc EditUser
   []
   (let [{:keys [id first_name last_name username email password]}
         (-> (inertia-cljs/use-page)
             (get-in [:props :user]))
         {:keys [data setData errors post processing]}
-        (j/lookup #c (useForm #js {:first_name first_name
+        (j/lookup (useForm #js {:first_name first_name
                                    :last_name last_name
                                    :username username
                                    :email email

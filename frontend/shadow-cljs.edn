@@ -20,7 +20,7 @@
                      :external-index "target/index.js"}
 
         :compiler-options {:source-map true}
-        :release {:output-dir "target/release/app"}
+        :release {:output-dir "target/release"}
         :build-hooks [(shadow.cljs.build-report/hook)]
         :devtools {:preloads [hashp.core
                               hashc.core

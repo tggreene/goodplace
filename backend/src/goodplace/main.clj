@@ -23,7 +23,8 @@
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.middleware.stacktrace :refer [wrap-stacktrace]]
-            [jsonista.core :as json]))
+            [jsonista.core :as json])
+  (:gen-class))
 
 (defn inertia-handler
   ([id]
@@ -57,7 +58,8 @@
    :create-note {:get {:handler (inertia-handler :create-note)}
                  :post {:handler (handlers/create-note-post context)}}
    :delete-note {:delete {:handler (handlers/delete-note context)}}
-   :cities {:get {:handler (handlers/cities context)}}})
+   :cities {:get {:handler (handlers/cities context)}}
+   :something-wrong {:get {:handler (inertia-handler :something-wrong)}}})
 
 (defn check-route-implementations
   [context]

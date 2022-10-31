@@ -10,12 +10,7 @@
    [tggreene.inertia-cljs.impl.react18 :as inertia-cljs-react]
    [clojure.set :as set]
    [clojure.walk :as walk]
-   [potpuri.core :as potpuri]
-   [devtools.core]))
-
-#_ (.init InertiaProgress)
-
-(devtools.core/install!)
+   [potpuri.core :as potpuri]))
 
 (def page-implementations
   {:home pages/Home

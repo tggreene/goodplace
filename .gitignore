@@ -8,6 +8,8 @@
 **/public/js/*.map
 **/public/css/*.css
 **/public/js/report.html
-*js.map
+**/classes/
+*.jar
+*.js.map
 .cache
 **/target/*

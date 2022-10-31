@@ -5,5 +5,5 @@
         :cmd "npx shadow-cljs watch app"
         :dir "frontend"}
        {:name "webpack"
-        :cmd "npx webpack --watch"
+        :cmd "npx webpack --config webpack.dev.js --watch"
         :dir "frontend"}]}

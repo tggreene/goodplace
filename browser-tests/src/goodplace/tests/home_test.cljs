@@ -10,8 +10,7 @@
       (-> (p/let [^js context (.newContext browser)
                   ^js page (.newPage context)
                   _ (.goto page "http://localhost:8090")
-                  content (.content page)
-                  _ (js/console.log content)]
+                  content (.content page)]
             (is (str/includes? content "Home")))
           (p/catch
               (fn [err]

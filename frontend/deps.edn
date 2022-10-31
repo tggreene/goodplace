@@ -8,7 +8,7 @@
   lilactown/helix {:mvn/version "0.1.6"}
   goodplace/shared {:local/root "../shared"}
   metosin/potpuri {:mvn/version "0.5.3"}
-  com.github.tggreene/inertia-cljs {:mvn/version "0.1.0"}
+  com.github.tggreene/inertia-cljs {:mvn/version "0.1.1"}
   ;; tggreene/inertia.cljs {:local/root "/Users/tim/Workspaces/github.com/tggreene/inertia.cljs"}
 
   ;; Dev Dependencies (these are DCEd so no harm having them here, one

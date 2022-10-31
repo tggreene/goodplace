@@ -90,7 +90,6 @@
 (comment
   (def db (:goodplace.db/db integrant.repl.state/system))
 
-  #p
   (list-all-notes db)
 
   (get-user-by-id db 1)

@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "webpack:watch": "webpack --config webpack.dev.js --watch",
+    "webpack:build": "webpack --config webpack.prod.js"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.11",
     "@chakra-ui/react": "^2.3.6",
