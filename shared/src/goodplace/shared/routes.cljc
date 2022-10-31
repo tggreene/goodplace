@@ -57,7 +57,6 @@
     :path "/users/:user-id/delete"
     :name "Delete User"
     :title "Delete User"
-    :page? true
     :authenticated? true}
 
    ;; Notes
@@ -90,7 +89,6 @@
     :path "/notes/:note-id/delete"
     :name "Delete Note"
     :title "Delete Note"
-    :page? true
     :authenticated? true}
 
    ;; Cities
