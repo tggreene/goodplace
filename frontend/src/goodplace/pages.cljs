@@ -25,16 +25,18 @@
 (defnc PageTemplate
   [{:keys [title children]}]
   (let [page (usePage)]
-    ($ Flex {:direction "column"
-             :justify "center"
-             :align "center"
-             :width "100%"
-             :gap 4}
-       ($ Box {:p 4}
-          ($ Heading {:size "2xl"} title))
-       children
-       ($ Box {:mt 10}
-          ($ JsObjectBlock {:object page})) )))
+    (<>
+     ($ Head {:title title})
+     ($ Flex {:direction "column"
+              :justify "center"
+              :align "center"
+              :width "100%"
+              :gap 4}
+        ($ Box {:p 4}
+           ($ Heading {:size "2xl"} title))
+        children
+        ($ Box {:mt 10}
+           ($ JsObjectBlock {:object page})) ))))
 
 (defnc CircularProgressTimed
   [{:keys [time-ms]}]
