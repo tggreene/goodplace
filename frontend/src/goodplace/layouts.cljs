@@ -13,10 +13,6 @@
    [applied-science.js-interop :as j]
    [react :as react]))
 
-#c localStorage
-#c writeStorage
-#c useLocalStorage
-
 (def top-bar-height 14)
 (def top-bar-height-var "var(--chakra-sizes-14)")
 

@@ -35,7 +35,6 @@
 
 (defn links
   [uri query-string current-page total per-page]
-  #p 'x
   (let [uri (str uri
                  "?"
                  (when query-string
