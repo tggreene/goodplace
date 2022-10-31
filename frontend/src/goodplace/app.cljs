@@ -3,10 +3,11 @@
    ["@inertiajs/inertia" :refer [Inertia]]
    ["@inertiajs/progress" :refer [InertiaProgress]]
    ["@chakra-ui/react" :refer [ChakraProvider]]
-   [goodplace.inertia :refer [create-inertia-app]]
    [goodplace.layouts :as layouts]
    [goodplace.pages :as pages]
    [goodplace.shared.routes :as routes]
+   [tggreene.inertia-cljs :as inertia-cljs]
+   [tggreene.inertia-cljs.impl.react18 :as inertia-cljs-react]
    [clojure.set :as set]
    [clojure.walk :as walk]
    [potpuri.core :as potpuri]
@@ -52,12 +53,13 @@
 
 (defn setup-inertia
   []
-  (create-inertia-app
+  (inertia-cljs/simple-inertia-app
    {:page-fn #(get-in indexed-pages [(keyword %) :impl])
-    :pages pages
-    :title-fn (constantly "Goodplace")
+    :title-fn #(str % " - GoodPlace")
+    :layout-component layouts/Default
+    :layout-props {:pages pages}
     :root-component ChakraProvider
-    :layout-component layouts/Default}))
+    :react-root-renderer inertia-cljs-react/renderer}))
 
 (defn start!
   []

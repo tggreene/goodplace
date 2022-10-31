@@ -10,7 +10,7 @@
    [goodplace.shared.routes :as routes]
    [applied-science.js-interop :as j]
    [clojure.pprint :refer [pprint]]
-   [goodplace.inertia :as inertia]))
+   [tggreene.inertia-cljs :as inertia-cljs]))
 
 (defnc JsObjectBlock
   [{:keys [object]}]
@@ -247,7 +247,7 @@
 (defnc CreateNote
   []
   (let [{:keys [data setData errors post processing]}
-        (inertia/use-form {:title ""
+        (inertia-cljs/use-form {:title ""
                            :contents ""})]
     ($ "form" {:onSubmit
                #(do (.preventDefault %)
@@ -462,7 +462,7 @@
 (defnc EditUser
   []
   (let [{:keys [id first_name last_name username email password]}
-        (-> (inertia/use-page)
+        (-> (inertia-cljs/use-page)
             (get-in [:props :user]))
         {:keys [data setData errors post processing]}
         (j/lookup #c (useForm #js {:first_name first_name
