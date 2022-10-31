@@ -1,0 +1,8 @@
+{:deps true
+ :npm-deps {:install false}
+ :builds
+ {:node-test
+  {:target :node-test
+   :output-to "out/node-tests.js"
+   :main goodplace.tests.runner/run-tests
+   :autorun true}}}

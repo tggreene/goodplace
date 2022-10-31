@@ -41,14 +41,14 @@
   (dissoc user :password))
 
 (defn update-user!
-  [db user]
+  [db {:keys [id] :as user}]
   (let [encrypted-user (cond-> user
                          (:password user)
                          (update :password password/encrypt))
         query (h/format {:update :users
                          :set (merge encrypted-user
                                      {:updated_at :current_timestamp})
-                         :where [:= :email]})]
+                         :where [:= :id id]})]
     (jdbc/execute! db query)))
 
 (defn soft-delete-user!
@@ -107,6 +107,8 @@
   (create-users-table temp-db)
 
   (destroy-users-table temp-db)
+
+  (restore-deleted-user! temp-db 1)
 
   (create-user
    temp-db

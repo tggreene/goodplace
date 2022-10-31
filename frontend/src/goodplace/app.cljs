@@ -22,8 +22,7 @@
    :login pages/Login
 
    :users pages/Users
-   ;; :view-user pages/ViewUser
-   ;; :edit-user pages/EditUser
+   :edit-user pages/EditUser
    :create-user pages/CreateUser
 
    :notes pages/Notes

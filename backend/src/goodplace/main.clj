@@ -22,6 +22,7 @@
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
+            [ring.middleware.stacktrace :refer [wrap-stacktrace]]
             [jsonista.core :as json]))
 
 (defn inertia-handler
@@ -43,7 +44,6 @@
    :logout {:get {:handler handlers/logout}}
 
    :users {:get {:handler (handlers/users context)}}
-   :view-user {:get {:handler (handlers/view-user context)}}
    :edit-user {:get {:handler (handlers/edit-user-get context)}
                :post {:handler (handlers/edit-user-post context)}}
    :create-user {:get {:handler (inertia-handler :create-user)}
@@ -109,7 +109,7 @@
                          [bam/wrap-authentication backend]
                          mw/wrap-auth
                          [wrap-inertia-share context]
-                         [inertia/wrap-inertia template asset-version]]}} )
+                         [inertia/wrap-inertia template asset-version]]}})
    (reitit.ring/routes
     (reitit.ring/create-file-handler {:path "/"})
     (reitit.ring/create-default-handler

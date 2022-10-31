@@ -2,8 +2,6 @@
 
  :npm-deps {:install false}
 
- :dev-http {8091 {:roots ["public"]}}
-
  :builds
  {:app {:target :browser
         :modules {:app {:entries [goodplace.app]}}

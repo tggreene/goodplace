@@ -6,9 +6,6 @@
   (let [half (int (Math/floor (/ link-count 2)))
         before (- current-page 1)
         after (- page-number current-page)
-        tweak-odd (if (odd? link-count)
-                    inc
-                    identity)
         current-range
         (cond
           (< before half) (range (- current-page before)

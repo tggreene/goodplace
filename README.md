@@ -10,14 +10,20 @@ and lags further behind.
 
 - [x] Add easy running of cljs, js parts
 - [x] Add authentication for routes
-- [ ] Add user management
+- [x] Add basic tests
+- [x] Add user management
+- [ ] Reimplement cljs friendly hooks for inertia
 - [ ] Add authorization for routes
+- [ ] Improve error feedback development time
+- [ ] Maybe do more to split development time dependencies
+- [ ] CI (Github Actions)
+- [ ] Deployment (fly.io)
+- [ ] Improve tests
 - [ ] Improve appearance of side menu
 - [ ] Add individual pages for server errors
 - [ ] Add components to wrap inertia links, buttons
 - [ ] Separate handlers into namespaces
 - [ ] Separate pages into namespaces
-- [ ] Reimplement cljs friendly hooks for inertia
 
 ## Adding a new page or route
 

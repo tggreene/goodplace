@@ -1,0 +1,20 @@
+{:paths ["src" "test"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/clojurescript {:mvn/version "1.11.60"}
+        applied-science/js-interop {:mvn/version "0.3.1"}
+        cljs-bean/cljs-bean {:mvn/version "1.7.0"}
+        funcool/promesa {:mvn/version "8.0.450"}
+        goodplace/shared {:local/root "../shared"}
+        metosin/potpuri {:mvn/version "0.5.3"}
+
+        ;; Dev Dependencies (these are DCEd so no harm having them here, one
+        ;; less alias to juggle)
+        thheller/shadow-cljs {:mvn/version "2.20.7"}
+        binaryage/devtools {:mvn/version "1.0.5"}
+        cider/cider-nrepl {:mvn/version "0.28.3"}
+        cider/piggieback {:mvn/version "0.5.2"}
+        org.clojars.tggreene/hashp {:mvn/version "0.3.0"}
+        tggreene/hashc {:local/root "/Users/tim/Workspaces/github.com/tggreene/hashc"}
+        philoskim/debux {:mvn/version "0.7.8"}
+        refactor-nrepl/refactor-nrepl {:mvn/version "3.5.5"}
+        djblue/portal {:mvn/version "0.23.0"}}}

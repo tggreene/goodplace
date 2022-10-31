@@ -41,12 +41,6 @@
     :page? true
     :nav? true
     :authenticated? true}
-   {:id :view-user
-    :path "/users/:user-id"
-    :name "View User"
-    :title "View User"
-    :page? true
-    :authenticated? true}
    {:id :edit-user
     :path "/users/:user-id/edit"
     :name "Edit User"

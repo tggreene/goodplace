@@ -35,9 +35,9 @@
           session (:session request)]
       (if (and user (password/check password (:password user)))
         (let [updated-session (assoc session :identity sanitized-user)]
-          (-> (response/redirect "/")
+          (-> (response/redirect (routes/get-route-path :home))
               (assoc :session updated-session)))
-        (-> (response/redirect "/login")
+        (-> (response/redirect (routes/get-route-path :login))
             (assoc :flash
                    {:error
                     {:email "These credentials do not match our records."}}))))))
@@ -52,24 +52,6 @@
   [_]
   (-> (response/redirect "/" :see-other)
       (assoc :session nil)))
-
-#_
-(defn cities
-  [context]
-  (fn [{:keys [params query-string uri] :as request}]
-    (let [filters (select-keys params [:search :country])
-          all-cities @goodplace.examples.cities/cities
-          page (Integer/parseInt (get params :page "1"))
-          offset (* (dec page) 10)
-          count (count all-cities)
-          cities (->> all-cities
-                      (drop offset)
-                      (take 10))
-          props {:cities {:data cities
-                          :current_page page
-                          :links (pagination/links uri query-string page count 10)}
-                 :filters filters}]
-      (inertia/render :cities props))))
 
 (def per-page 10)
 
@@ -88,39 +70,12 @@
                          :links (pagination/links uri query-string page count per-page)}}]
       (inertia/render :users props))))
 
-(defn view-user
-  [{:keys [db]}]
-  (fn [request]
-    (let [{:keys [id] :as user} (get-user request)
-          user-id (get-in request [:path-params :user-id])
-          user (users/get-user-by-id db user-id)]
-      (cond
-        (= id (:user user)) (inertia/render :view-user {:user user})
-        user (inertia/render :home {:errors ["Not permitted to view user"]
-                                    :redirect (routes/get-route-path :users)})
-        :else (inertia/render :home {:errors ["User not found"]
-                                     :redirect (routes/get-route-path :users)})))))
-
 (defn edit-user-get
   [{:keys [db]}]
   (fn [request]
-    (let [{:keys [id] :as user} (get-user request)
-          user-id (get-in request [:path-params :user-id])
+    (let [user-id (get-in request [:path-params :user-id])
           user (users/get-user-by-id db user-id)]
-      (cond
-        (= id (:user user)) (inertia/render :edit-user {:user user})
-        user (inertia/render :home {:errors ["Not permitted to view user"]
-                                    :redirect (routes/get-route-path :users)})
-        :else (inertia/render :home {:errors ["User not found"]
-                                     :redirect (routes/get-route-path :users)})))))
-
-(defn edit-user-post
-  [{:keys [db]}]
-  (fn [request]
-    (let [user (:body-params request)
-          _ (users/update-user! db user)
-          new-user (users/get-user-by-id db (:id user))]
-      (inertia/render :view-user {:user new-user}))))
+      (inertia/render :edit-user {:user user}))))
 
 (defn check-passwords-match
   [{:keys [password password2]}]
@@ -129,6 +84,20 @@
 (defn sanitize-create-user
   [user]
   (dissoc user :password2))
+
+(defn edit-user-post
+  [{:keys [db]}]
+  (fn [request]
+    (let [user-id (get-in request [:path-params :user-id])
+          user (assoc (:body-params request) :id user-id)]
+      (if (check-passwords-match user)
+        (do
+          (users/update-user! db (sanitize-create-user user))
+          (response/redirect (routes/get-route-path :users) :see-other))
+        (-> (response/redirect (routes/get-route-path :edit-user {:user-id user-id}))
+            (assoc :flash
+                   {:error
+                    {:password "Passwords don't match"}}))))))
 
 (defn create-user-post
   [{:keys [db]}]

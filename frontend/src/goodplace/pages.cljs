@@ -9,7 +9,8 @@
    [helix.hooks :as hooks]
    [goodplace.shared.routes :as routes]
    [applied-science.js-interop :as j]
-   [clojure.pprint :refer [pprint]]))
+   [clojure.pprint :refer [pprint]]
+   [goodplace.inertia :as inertia]))
 
 (defnc JsObjectBlock
   [{:keys [object]}]
@@ -145,7 +146,9 @@
                        :bg "red.50"
                        :borderRadius 6}
                   (for [error (vals errors)]
-                    ($ Text {:color "red.500"} error)))))))))
+                    ($ Text {:color "red.500"} error))))))
+       ($ Container {:fontStyle "italic"}
+          "Psst, try example@example.com with example as a password."))))
 
 (defnc About
   []
@@ -244,8 +247,8 @@
 (defnc CreateNote
   []
   (let [{:keys [data setData errors post processing]}
-        (j/lookup (useForm #js {:title ""
-                                :contents ""}))]
+        (inertia/use-form {:title ""
+                           :contents ""})]
     ($ "form" {:onSubmit
                #(do (.preventDefault %)
                     (post (routes/get-route-path :create-note)))}
@@ -257,13 +260,13 @@
              ($ FormControl
                 ($ FormLabel "Title")
                 ($ Input {:type "text"
-                          :value (.-title data)
-                          :onChange #(setData "title" (.. % -target -value))}))
+                          :value (:title data)
+                          :onChange #(setData :title (.. % -target -value))}))
              ($ FormControl
                 ($ FormLabel "Contents")
                 ($ Textarea {:type "text"
-                             :value (.-contents data)
-                             :onChange #(setData "contents" (.. % -target -value))
+                             :value (:contents data)
+                             :onChange #(setData :contents (.. % -target -value))
                              :height "md"})))
           ($ HStack {:mt 4}
              ($ InertiaLink {:href (routes/get-route-path :notes)}
@@ -328,7 +331,7 @@
                    ($ Th "Actions")))
              ($ Tbody
                 (for [user data
-                      :let [{:keys [first_name last_name email created_at]}
+                      :let [{:keys [id first_name last_name email created_at]}
                             (j/lookup user)
                             name (str first_name " " last_name)]]
                   ($ Tr {:key email}
@@ -337,12 +340,17 @@
                      ($ Td created_at)
                      ($ Td
                         ($ HStack
-                           ($ Button {:colorScheme "blue"
-                                      :size "sm"}
-                              "Edit User")
-                           ($ Button {:colorScheme "red"
-                                      :size "sm"}
-                              "Delete User"))))))))
+                           ($ InertiaLink {:as "span"
+                                           :href (routes/get-route-path :edit-user {:user-id id})}
+                              ($ Button {:colorScheme "blue"
+                                         :size "sm"}
+                                 "Edit User"))
+                           ($ InertiaLink {:as "span"
+                                           :href (routes/get-route-path :delete-user {:user-id id})
+                                           :method "delete"}
+                              ($ Button {:colorScheme "red"
+                                         :size "sm"}
+                                 "Delete User")))))))))
        ($ HStack
           (for [link links
                 :let [{:keys [url label active]} (j/lookup link)]]
@@ -361,6 +369,57 @@
     ($ PageTemplate {:title "Users"}
        ($ UsersTable {:users users}))))
 
+(defnc UserForm
+  [{:keys [data setData onSubmit errors]}]
+  ($ "form" {:onSubmit onSubmit}
+     ($ Flex {:direction "column"
+              :gap 4
+              :width "2xl"
+              :p 4}
+        ($ FormControl
+           ($ FormLabel "First Name")
+           ($ Input {:type "text"
+                     :value (.-first_name data)
+                     :onChange #(setData "first_name" (.. % -target -value))}))
+        ($ FormControl
+           ($ FormLabel "Last Name")
+           ($ Input {:type "text"
+                     :value (.-last_name data)
+                     :onChange #(setData "last_name" (.. % -target -value))}))
+        ($ FormControl
+           ($ FormLabel "Username")
+           ($ Input {:type "text"
+                     :value (.-username data)
+                     :onChange #(setData "username" (.. % -target -value))}))
+        ($ FormControl
+           ($ FormLabel "Email")
+           ($ Input {:type "text"
+                     :value (.-email data)
+                     :onChange #(setData "email" (.. % -target -value))}))
+        ($ FormControl
+           ($ FormLabel "Password")
+           ($ Input {:type "password"
+                     :value (.-password data)
+                     :onChange #(setData "password" (.. % -target -value))}))
+        ($ FormControl
+           ($ FormLabel "Re-type Password")
+           ($ Input {:type "password"
+                     :value (.-password2 data)
+                     :onChange #(setData "password2" (.. % -target -value))}))
+        (when (not-empty errors)
+          ($ Box {:p 4
+                  :bg "red.50"
+                  :borderRadius 6
+                  :minWidth "md"}
+             (for [error (vals errors)]
+               ($ Text {:color "red.500"} error))))
+        ($ HStack {:mt 4}
+           ($ InertiaLink {:href (routes/get-route-path :users)}
+              ($ Button "Back To Users"))
+           ($ Button {:type "submit"
+                      :colorScheme "blue"}
+              "Submit")))) )
+
 (defnc CreateUser
   []
   (let [{:keys [data setData errors post processing]}
@@ -372,54 +431,50 @@
                                 :password2 ""}))
         errors (js->clj errors)]
     ($ PageTemplate {:title "Create User"}
-       ($ "form" {:onSubmit
-                  #(do (.preventDefault %)
-                       (post (routes/get-route-path :create-user)))}
-          ($ Flex {:direction "column"
-                   :gap 4
-                   :width "2xl"
-                   :p 4}
-             ($ FormControl
-                ($ FormLabel "First Name")
-                ($ Input {:type "text"
-                          :value (.-first_name data)
-                          :onChange #(setData "first_name" (.. % -target -value))}))
-             ($ FormControl
-                ($ FormLabel "Last Name")
-                ($ Input {:type "text"
-                          :value (.-last_name data)
-                          :onChange #(setData "last_name" (.. % -target -value))}))
-             ($ FormControl
-                ($ FormLabel "Username")
-                ($ Input {:type "text"
-                          :value (.-username data)
-                          :onChange #(setData "username" (.. % -target -value))}))
-             ($ FormControl
-                ($ FormLabel "Email")
-                ($ Input {:type "text"
-                          :value (.-email data)
-                          :onChange #(setData "email" (.. % -target -value))}))
-             ($ FormControl
-                ($ FormLabel "Password")
-                ($ Input {:type "password"
-                          :value (.-password data)
-                          :onChange #(setData "password" (.. % -target -value))}))
-             ($ FormControl
-                ($ FormLabel "Re-type Password")
-                ($ Input {:type "password"
-                          :value (.-password2 data)
-                          :onChange #(setData "password2" (.. % -target -value))}))
-             (when (not-empty errors)
-               ($ Box {:p 4
-                       :bg "red.50"
-                       :borderRadius 6
-                       :minWidth "md"}
-                  (for [error (vals errors)]
-                    ($ Text {:color "red.500"} error))))
-             ($ HStack {:mt 4}
-                ($ InertiaLink {:href (routes/get-route-path :users)}
-                   ($ Button "Back To Users"))
-                ($ Button {:type "submit"
-                           :colorScheme "blue"}
-                   "Submit"))))
-       )))
+       ($ UserForm {:data data
+                    :setData setData
+                    :onSubmit #(do (.preventDefault %)
+                                   (post (routes/get-route-path :create-user)))
+                    :errors errors}))))
+
+#_
+(defnc EditUser
+  []
+  (let [{:keys [id first_name last_name username email password]}
+        (-> (usePage)
+            (j/get-in [:props :user])
+            (j/lookup))
+        {:keys [data setData errors post processing]}
+        (j/lookup #c (useForm #js {:first_name first_name
+                                   :last_name last_name
+                                   :username username
+                                   :email email
+                                   :password ""
+                                   :password2 ""}))
+        errors (js->clj errors)]
+    ($ PageTemplate {:title "Edit User"}
+       ($ UserForm {:data data
+                    :setData setData
+                    :onSubmit #(do (.preventDefault %)
+                                   (post (routes/get-route-path :edit-user {:user-id id})))
+                    :errors errors}))))
+
+(defnc EditUser
+  []
+  (let [{:keys [id first_name last_name username email password]}
+        (-> (inertia/use-page)
+            (get-in [:props :user]))
+        {:keys [data setData errors post processing]}
+        (j/lookup #c (useForm #js {:first_name first_name
+                                   :last_name last_name
+                                   :username username
+                                   :email email
+                                   :password ""
+                                   :password2 ""}))
+        errors (js->clj errors)]
+    ($ PageTemplate {:title "Edit User"}
+       ($ UserForm {:data data
+                    :setData setData
+                    :onSubmit #(do (.preventDefault %)
+                                   (post (routes/get-route-path :edit-user {:user-id id})))
+                    :errors errors}))))

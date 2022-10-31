@@ -4,12 +4,18 @@
                                Menu MenuButton MenuList MenuItem IconButton
                                Slide Link Image]]
    ["@chakra-ui/icons" :refer [ChevronDownIcon HamburgerIcon]]
-   ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage]]
+   ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage useRemember]]
+   ["@rehooks/local-storage" :refer [writeStorage useLocalStorage]
+    :as localStorage]
    [helix.core :refer [defnc $ <>]]
    [helix.hooks :as hooks]
    [goodplace.shared.routes :as routes]
    [applied-science.js-interop :as j]
    [react :as react]))
+
+#c localStorage
+#c writeStorage
+#c useLocalStorage
 
 (def top-bar-height 14)
 (def top-bar-height-var "var(--chakra-sizes-14)")
@@ -90,7 +96,9 @@
 (defnc Default
   [{:keys [pages children]}]
   (let [pageData (usePage)
-        [menuOpen setMenuOpen] (hooks/use-state false)
+        [menuOpen] (useLocalStorage "MenuOpen" false)
+        setMenuOpen (fn [value]
+                          (writeStorage "MenuOpen" value))
         user (j/get-in pageData [:props :auth :user])]
     ($ Flex {:direction "column"
              :justify "center"

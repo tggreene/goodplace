@@ -1,6 +1,6 @@
 (ns goodplace.inertia
   (:require
-   ["@inertiajs/inertia-react" :refer [createInertiaApp]]
+   ["@inertiajs/inertia-react" :refer [createInertiaApp useForm usePage]]
    ["react" :as react]
    ["react-dom/client" :as react-dom]
    [applied-science.js-interop :as j]))
@@ -33,3 +33,18 @@
           (.render root (react/createElement root-component
                                              nil
                                              (react/createElement App props))))}))
+
+(defn use-form
+  [initialData]
+  (let [{:keys [data setData post processing errors]}
+        (j/lookup (useForm (clj->js initialData)))]
+    {:data (js->clj data :keywordize-keys true)
+     :setData #(setData (name %1) %2)
+     :post post
+     :processing processing
+     :errors (js->clj errors :keywordize-keys true)}))
+
+(defn use-page
+  []
+  (let [page (usePage)]
+    (js->clj page :keywordize-keys true)))
