@@ -13,6 +13,8 @@
 (def halt igr/halt)
 (def reset igr/reset)
 (def reset-all igr/reset-all)
+(def auto-reset igr-auto/start-auto-reset)
+(def stop-auto-reset igr-auto/stop-auto-reset)
 
 (comment
   (go)

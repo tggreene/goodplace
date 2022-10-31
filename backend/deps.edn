@@ -27,7 +27,10 @@
    :extra-deps {integrant/repl {:mvn/version "0.3.2"}
                 tggreene/integrant-repl-autoreload
                 {:local/root "../../integrant-repl-autoreload"}}
-   :main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace.dev/go)"]
+   ;; with auto-reset
+   :main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace.dev/go),(goodplace.dev/auto-reset)"]
+   ;; without auto-reset
+   ;;:main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace,dev/go)"]
    :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]}
   :run {:main-opts ["-m" "goodplace.main"]}
   :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.303"}}
