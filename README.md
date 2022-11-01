@@ -17,17 +17,19 @@ and lags further behind.
 - [x] Add titles to pages
 - [x] Produce jar of application
 - [x] Deployment (fly.io)
-- [ ] Fix broken symbols in prod
-- [ ] Add local postgres
 - [x] Improve error feedback development time
+- [x] Add local postgres
+- [x] Separate handlers into namespaces
+- [ ] Use postgres for notes too
+- [ ] Fix broken symbols in prod
+- [ ] Add rationale for GoodPlace
 - [ ] Add authorization for routes
-- [ ] Maybe do more to split development time dependencies
-- [ ] CI (Github Actions)
+- [ ] Do more to split development time dependencies
+- [ ] CI tests (Github Actions)
 - [ ] Improve tests
 - [ ] Improve appearance of side menu
 - [ ] Add individual pages for server errors
 - [ ] Add components to wrap inertia links, buttons
-- [ ] Separate handlers into namespaces
 - [ ] Separate pages into namespaces
 
 ## Adding a new page or route
