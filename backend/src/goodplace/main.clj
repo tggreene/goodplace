@@ -107,10 +107,9 @@
       (prone/wrap-exceptions {:app-namespaces ['goodplace]})))
 
 (defmethod ig/init-key ::server
-  [_ {:keys [port dynamic? db postgres] :as opts}]
+  [_ {:keys [port dynamic? postgres] :as opts}]
   (log/infof "Starting Server {port: %d}" port)
-  (let [context {:db db
-                 :postgres postgres}]
+  (let [context {:postgres postgres}]
     (check-handlers handlers context)
     (jetty/run-jetty
      (if dynamic?

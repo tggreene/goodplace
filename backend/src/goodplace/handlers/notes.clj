@@ -6,14 +6,14 @@
             [ring.util.response :as response]))
 
 (defn list-notes
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [{:keys [id] :as user} (common/get-user request)
           notes (model/list-user-notes postgres id)]
       (inertia/render :notes {:notes notes}))))
 
 (defn view-note
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [{:keys [id] :as user} (common/get-user request)
           note-id (get-in request [:path-params :note-id])
@@ -26,7 +26,7 @@
                                      :redirect (routes/get-route-path :notes)})))))
 
 (defn edit-note-get
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [{:keys [id] :as user} (common/get-user request)
           note-id (get-in request [:path-params :note-id])
@@ -39,7 +39,7 @@
                                      :redirect (routes/get-route-path :notes)})))))
 
 (defn edit-note-post
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [note-id (get-in request [:path-params :note-id])
           note (:body-params request)]
@@ -49,7 +49,7 @@
        :see-other))))
 
 (defn create-note-post
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [user (common/get-user request)
           note (:body-params request)
@@ -61,7 +61,7 @@
        :see-other))))
 
 (defn delete-note
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [user (common/get-user request)
           note-id (get-in request [:path-params :note-id])]

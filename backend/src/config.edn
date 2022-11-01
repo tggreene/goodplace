@@ -5,11 +5,7 @@
                     :default 8080}
     :dynamic? #profile {:dev true
                         :default false}
-    :db #ig/ref :goodplace.db/db
     :postgres #ig/ref :goodplace.db/postgres-client}
-   :goodplace.db/db
-   {:db-spec {:dbtype "sqlite"
-              :dbname "resources/db/db.sqlite"}}
    :goodplace.db/postgres-client
    {:db-spec #profile {:dev {:dbtype "postgres"
                              :user "postgres"

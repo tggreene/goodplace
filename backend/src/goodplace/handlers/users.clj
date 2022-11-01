@@ -8,7 +8,7 @@
             [goodplace.utils.coerce :as coerce]))
 
 (defn list-users
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [{:keys [params query-string uri] :as request}]
     (let [all-users (model/list-users postgres)
           page (Integer/parseInt (get params :page "1"))
@@ -26,7 +26,7 @@
       (inertia/render :users props))))
 
 (defn edit-user-get
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [user-id (get-in request [:path-params :user-id])
           user (model/get-user-by-id postgres user-id)]
@@ -41,7 +41,7 @@
   (dissoc user :password2))
 
 (defn edit-user-post
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [user-id (get-in request [:path-params :user-id])
           user (assoc (:body-params request) :id user-id)]
@@ -55,7 +55,7 @@
                     {:password "Passwords don't match"}}))))))
 
 (defn create-user-post
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [user (:body-params request)]
       (if (check-passwords-match user)
@@ -68,7 +68,7 @@
                     {:password "Passwords don't match"}}))))))
 
 (defn delete-user
-  [{:keys [db postgres]}]
+  [{:keys [postgres]}]
   (fn [request]
     (let [user (common/get-user request)
           user-id (get-in request [:path-params :user-id])]
