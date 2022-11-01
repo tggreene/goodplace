@@ -148,7 +148,6 @@
   (count (list-all-notes pg))
 
   (doseq [{:keys [id]} (list-all-notes pg)]
-    #p id
-    #p (hard-delete-note! pg id))
+    (hard-delete-note! pg id))
 
   )
