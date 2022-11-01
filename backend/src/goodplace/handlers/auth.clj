@@ -9,12 +9,16 @@
 (defn authenticate
   "Check request username and password against authdata
   username and passwords."
-  [db]
+  [{:keys [postgres]}]
   (fn [request]
     (let [email (-> request :body-params :email)
           password (-> request :body-params :password)
-          user (users/get-user-by-email db email)
-          sanitized-user (dissoc user :password)
+          user (users/get-user-by-email postgres email)
+          sanitized-user (dissoc user
+                                 :password
+                                 :created_at
+                                 :updated_at
+                                 :deleted_at)
           session (:session request)]
       (if (and user (password/check password (:password user)))
         (let [updated-session (assoc session :identity sanitized-user)]
