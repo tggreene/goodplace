@@ -28,7 +28,8 @@
   {:extra-paths ["dev/src"]
    :extra-deps {integrant/repl {:mvn/version "0.3.2"}
                 com.github.tggreene/integrant-repl-autoreload {:mvn/version "0.2.0"}
-                org.clojars.bigsy/pg-embedded-clj {:mvn/version "1.0.0"}}
+                org.clojars.bigsy/pg-embedded-clj {:mvn/version "1.0.0"}
+                io.zonky.test.postgres/embedded-postgres-binaries-linux-arm64v8 {:mvn/version "15.0.0"}}
    ;; with auto-reset
    :main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace.dev/go),(goodplace.dev/auto-reset)"]
    ;; without auto-reset
