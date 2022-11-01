@@ -24,6 +24,7 @@ and lags further behind.
 - [x] Remove old sqlite implementations
 - [ ] Fix broken symbols in prod
 - [ ] Use production postgres
+- [ ] Mobile views
 - [ ] Add rationale for GoodPlace
 - [ ] Add authorization for routes
 - [ ] Do more to split development time dependencies

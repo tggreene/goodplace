@@ -54,7 +54,10 @@
                          (:password user)
                          (update :password password/encrypt))
         query (h/format {:insert-into :users
-                         :values [encrypted-user]})]
+                         :values [encrypted-user]
+                         :on-conflict [:id]
+                         :do-nothing []
+                         :returning [:id]})]
     (jdbc/execute! db query)))
 
 (defn create-user-postgres!

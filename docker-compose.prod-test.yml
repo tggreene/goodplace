@@ -1,0 +1,23 @@
+version: "3.3"
+services:
+  goodplace:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    network_mode: "host"
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    network_mode: "host"
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local

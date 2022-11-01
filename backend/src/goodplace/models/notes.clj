@@ -59,7 +59,9 @@
                  (update :user_id coerce/to-int))
         query (h/format {:insert-into :notes
                          :values [note]
-                         :returning [:id]})]
+                         :returning [:id]
+                         :on-conflict [:id]
+                         :do-nothing []})]
     (jdbc/execute! db query)))
 
 (defn update-note!

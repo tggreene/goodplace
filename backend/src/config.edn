@@ -10,5 +10,12 @@
    {:db-spec #profile {:dev {:dbtype "postgres"
                              :user "postgres"
                              :password "postgres"
-                             :port 5432}}}}
-  #profile {:dev {:goodplace.db/postgres-server nil}}]}
+                             :port 5432}
+                       :default {:dbtype "postgres"
+                                 :user "postgres"
+                                 :password "postgres"
+                                 :port 5432}}}
+   :goodplace.migrations/migrations
+   {:postgres #ig/ref :goodplace.db/postgres-client}}
+  #profile {:dev {:goodplace.dev.db/postgres-server nil}
+            :default {}}]}
