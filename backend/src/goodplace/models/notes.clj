@@ -3,7 +3,8 @@
             [honey.sql :as h]
             [honey.sql.helpers :refer [where]]
             [next.jdbc :as jdbc]
-            [next.jdbc.sql :as sql]))
+            [next.jdbc.sql :as sql]
+            [goodplace.utils.coerce :as coerce]))
 
 (defn create-notes-table!
   [db]
@@ -20,38 +21,55 @@
          "  FOREIGN KEY(user) REFERENCES user(id)"
          ");")]))
 
+(defn create-notes-table-postgres!
+  [db]
+  (jdbc/execute!
+   db
+   [(str "CREATE TABLE notes (\n"
+         "  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n"
+         "  user_id INTEGER NOT NULL,\n"
+         "  title TEXT NOT NULL,\n"
+         "  contents TEXT NOT NULL,\n"
+         "  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n"
+         "  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n"
+         "  deleted_at TIMESTAMP,\n"
+         "  CONSTRAINT fk_user_id FOREIGN KEY(user_id) REFERENCES users(id)"
+         ");")]))
+
 (defn destroy-notes-table!
   [db]
   (jdbc/execute!
    db
-   ["DROP TABLE users;"]))
+   ["DROP TABLE notes;"]))
 
 (defn get-note-by-id
   [db note-id]
   (let [query (h/format {:select [:*]
                          :from [:notes]
                          :where [:and
-                                 [:= :id note-id]
+                                 [:= :id (coerce/to-uuid note-id)]
                                  [:= :deleted_at nil]]})]
     (jdbc/execute-one! db query)))
 
 (defn create-note!
   [db note]
   (let [id (random-uuid)
-        note (assoc note :id id)
+        note (-> note
+                 (assoc :id id)
+                 (update :user_id coerce/to-int))
         query (h/format {:insert-into :notes
-                         :values [note]})]
-    (jdbc/execute! db query)
-    (get-note-by-id db id)))
+                         :values [note]
+                         :returning [:id]})]
+    (jdbc/execute! db query)))
 
 (defn update-note!
   [db {:keys [id] :as note}]
   (let [query (h/format {:update :notes
-                         :set (merge note
-                                     {:updated_at :current_timestamp})
-                         :where [:= :id id]})]
-    (jdbc/execute-one! db query)
-    (get-note-by-id db id)))
+                         :set (-> note
+                                  (dissoc :id)
+                                  (assoc :updated_at :current_timestamp))
+                         :where [:= :id (coerce/to-uuid id)]})]
+    (jdbc/execute-one! db query)))
 
 (defn list-all-notes
   [db]
@@ -66,7 +84,7 @@
   (let [query (h/format {:select [:*]
                          :from [:notes]
                          :where [:and
-                                 [:= :user user-id]
+                                 [:= :user_id (coerce/to-int user-id)]
                                  [:= :deleted_at nil]]
                          :order-by [:created_at]})]
     (jdbc/execute! db query)))
@@ -76,16 +94,14 @@
   (let [query (h/format {:update :notes
                          :set {:deleted_at :current_timestamp
                                :updated_at :current_timestamp}
-                         :where [:= :id id]})]
+                         :where [:= :id (coerce/to-uuid id)]})]
     (jdbc/execute-one! db query)))
 
 (defn hard-delete-note!
   [db id]
   (let [query (h/format {:delete-from :notes
-                         :where [:= :id id]})]
+                         :where [:= :id (coerce/to-uuid id)]})]
     (jdbc/execute-one! db query)))
-
-
 
 (comment
   (def db (:goodplace.db/db integrant.repl.state/system))
@@ -113,5 +129,27 @@
   (get-note-by-id db "d6012295-c3e5-4961-a529-b95f20121065")
 
   (hard-delete-note! db "5546f503-2c4e-49c9-8ba6-4a5e380c9fde")
+
+  )
+
+(comment
+  (def pg (:goodplace.db/postgres-client integrant.repl.state/system))
+
+  pg
+
+  (jdbc/execute! pg ["SELECT version();"])
+
+  (doseq [note (->> (list-all-notes db)
+                    (map #(-> %
+                              (clojure.set/rename-keys {:user :user_id})
+                              (dissoc :created_at :updated_at :deleted_at))))]
+    (clojure.pprint/pprint note)
+    (create-note! pg note))
+
+  (clojure.pprint/pprint (list-all-notes pg))
+
+  (create-notes-table-postgres! pg)
+
+  (destroy-notes-table! pg)
 
   )

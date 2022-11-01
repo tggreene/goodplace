@@ -103,6 +103,7 @@
         (reitit.ring/create-file-handler {:path "/"})
         (reitit.ring/create-default-handler
          {:not-found not-found-inertia})))
+      ;; Prone must be a top level middleware
       (prone/wrap-exceptions {:app-namespaces ['goodplace]})))
 
 (defmethod ig/init-key ::server

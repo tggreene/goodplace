@@ -20,7 +20,8 @@ and lags further behind.
 - [x] Improve error feedback development time
 - [x] Add local postgres
 - [x] Separate handlers into namespaces
-- [ ] Use postgres for notes too
+- [x] Use postgres for notes too
+- [ ] Remove old sqlite implementations
 - [ ] Fix broken symbols in prod
 - [ ] Add rationale for GoodPlace
 - [ ] Add authorization for routes

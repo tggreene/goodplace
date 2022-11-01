@@ -35,6 +35,7 @@
         ($ Box {:p 4}
            ($ Heading {:size "2xl"} title))
         children
+        #_
         ($ Box {:mt 10}
            ($ JsObjectBlock {:object page})) ))))
 
