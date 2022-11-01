@@ -31,7 +31,8 @@
                     :href (routes/get-route-path :view-note {:note-id id})}
        ($ Flex {:direction "column"
                 :gap 1
-                :width "xl"
+                :minWidth #js {:base "80vw"
+                               :lg "lg"}
                 :bg "gray.50"
                 :borderRadius 6
                 :p 4}
@@ -55,7 +56,8 @@
     ($ PageTemplate {:title "Note"}
        ($ Flex {:direction "column"
                 :gap 1
-                :width "2xl"
+                :width #js {:base "80vw"
+                            :lg "2xl"}
                 :p 4}
           ($ Text {:fontWeight "bold"} title)
           ($ Text contents))
@@ -83,7 +85,9 @@
        ($ PageTemplate {:title "Note"}
           ($ Flex {:direction "column"
                    :gap 4
-                   :width "2xl"
+                   :width #js {:base "75vw"
+                               :lg "lg"}
+
                    :p 4}
              ($ FormControl
                 ($ FormLabel "Title")

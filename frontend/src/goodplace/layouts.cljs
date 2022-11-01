@@ -1,14 +1,20 @@
 (ns goodplace.layouts
   (:require
-   ["@chakra-ui/react" :refer [Box Button ChakraProvider Flex Heading Text
-                               Menu MenuButton MenuList MenuItem IconButton
-                               Slide Link Image]]
+   ["@chakra-ui/react"
+    :refer
+    [Box Button ChakraProvider Flex Heading Text
+     Menu MenuButton MenuList MenuItem IconButton
+     Slide Link Image Spacer]]
    ["@chakra-ui/icons" :refer [ChevronDownIcon HamburgerIcon]]
-   ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage useRemember]]
+   ["@inertiajs/inertia-react"
+    :refer
+    [Head InertiaLink usePage useRemember]]
    ["@rehooks/local-storage" :refer [writeStorage useLocalStorage]
     :as localStorage]
+   ["react-use" :refer [useMedia]]
    [helix.core :refer [defnc $ <>]]
    [helix.hooks :as hooks]
+   [goodplace.components :refer [ResponsiveIndicator]]
    [goodplace.shared.routes :as routes]
    [applied-science.js-interop :as j]
    [react :as react]))
@@ -22,7 +28,10 @@
         name (str first_name " " last_name)]
     ($ Menu
        ($ MenuButton {:as Button
-                      :rightIcon ($ ChevronDownIcon)} name)
+                      :rightIcon ($ ChevronDownIcon)
+                      :textOverflow "ellipsis"
+                      :overflow "hidden"}
+          name)
        ($ MenuList
           (let [{:keys [name path]} (routes/get-route :logout)]
             ($ InertiaLink {:href path}
@@ -31,28 +40,32 @@
 (defnc TopBar
   [{:keys [user setMenuOpen menuOpen]}]
   ($ Flex {:height top-bar-height
-           :justify "space-between"
            :align "center"
            :width "100%"
            :borderBottomWidth 1
            :borderBottomColor "gray.100"
            :borderBottomStyle "solid"
            :zIndex 1}
-     ($ Box {:px 2
-             :minWidth "xs"}
+     ($ Box {:px 2}
         ($ IconButton {:icon ($ HamburgerIcon)
                        :onClick #(setMenuOpen (not menuOpen))}))
-     ($ Box {:px 4}
+     ($ Box {:px 2}
         ($ Image {:src "/images/goodplace_small.png"
                   :height 6}))
+     #_
+     ($ Box
+        ($ ResponsiveIndicator))
+     ($ Spacer)
      ($ Flex {:px 2
-              :minWidth "xs"
+              :minWidth #js [0 "8rem"]
               :justifyContent "flex-end"}
         (if user
           ($ UserMenu {:user user})
           (let [{:keys [path name]} (routes/get-route :login)]
             ($ InertiaLink {:href path}
-               ($ Button name)))))) )
+               ($ Button {:textOverflow "ellipsis"
+                          :overflow "hidden"}
+                  name)))))))
 
 (defn filter-pages
   [{:keys [user]} pages]

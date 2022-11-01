@@ -18,7 +18,13 @@
 (defnc UsersTable
   [{:keys [users]}]
   (let [{:keys [data links current_page]} users]
-    ($ VStack {:gap 4}
+    ($ VStack {:gap 4
+               :display #js {:base "block"
+                             :lg "flex"}
+               :overflow #js {:base "scroll"
+                              :lg "initial"}
+               :width #js {:base "90vw"
+                           :lg "100%"}}
        ($ Box {:width "100%"
                :px 6}
           ($ InertiaLink {:href (routes/get-route-path :create-user)}
@@ -27,8 +33,10 @@
           ($ Table {:variant "simple"}
              ($ Thead
                 ($ Tr
-                   ($ Th {:minWidth "xs"} "Name")
-                   ($ Th {:minWidth "xs"} "Email")
+                   ($ Th {:minWidth #js {:base "initial"
+                                         :xl "xs"}} "Name")
+                   ($ Th {:minWidth #js {:base "initial"
+                                         :xl "xs"}} "Email")
                    ($ Th "Created")
                    ($ Th "Actions")))
              ($ Tbody
@@ -76,7 +84,8 @@
   ($ "form" {:onSubmit onSubmit}
      ($ Flex {:direction "column"
               :gap 4
-              :width "2xl"
+              :width #js {:base "80vw"
+                          :lg "2xl"}
               :p 4}
         ($ FormControl
            ($ FormLabel "First Name")

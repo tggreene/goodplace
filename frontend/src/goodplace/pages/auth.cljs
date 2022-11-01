@@ -27,17 +27,20 @@
                   #(do (.preventDefault %)
                        (post (routes/get-route-path :login)))}
           ($ Flex {:direction "column"
+                   :alignItems "center"
                    :p 2
                    :gap 2
-                   :width "md"}
+                   :width #js ["xs" "md"]}
              ($ Input {:type "text"
                        :placeholder "Email"
                        :value (.-email data)
-                       :onChange #(setData "email" (.. % -target -value))})
+                       :onChange #(setData "email" (.. % -target -value))
+                       :maxWidth #js ["80%" "initial"]})
              ($ Input {:type "password"
                        :placeholder "Password"
                        :value (.-password data)
-                       :onChange #(setData "password" (.. % -target -value))})
+                       :onChange #(setData "password" (.. % -target -value))
+                       :maxWidth #js ["80%" "initial"]})
              ($ Button {:type "submit"
                         :colorScheme "blue"} "Submit")
              (when (not-empty errors)
@@ -47,4 +50,4 @@
                   (for [error (vals errors)]
                     ($ Text {:color "red.500"} error))))))
        ($ Container {:fontStyle "italic"}
-          "Psst, try example@example.com with example as a password."))))
+          "Psst, try example@example.com with password as a password."))))

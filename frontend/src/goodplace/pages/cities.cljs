@@ -18,7 +18,10 @@
 (defnc CitiesTable
   [{:keys [cities]}]
   (let [{:keys [data links current_page]} cities]
-    ($ VStack
+    ($ VStack {:display #js {:base "block"
+                             :lg "flex"}
+               :width #js {:base "90vw"
+                           :lg "100%"}}
        ($ TableContainer
           ($ Table {:variant "simple"}
              ($ Thead
@@ -35,12 +38,14 @@
                      ($ Td country)
                      ($ Td lat)
                      ($ Td lng))))))
-       ($ HStack
+       ($ HStack {:display "flex"
+                  :flexWrap #js ["wrap" nil]}
           (for [link links
                 :let [{:keys [url label active]} (j/lookup link)]]
             ($ InertiaLink {:key (str url label)
                             :href url}
-               (let [props (cond-> {:minWidth 14}
+               (let [props (cond-> {:minWidth 14
+                                    :m 1}
                              active (merge {:colorScheme "blue"})
                              (not url) (merge {:disabled true}))]
                  ($ Button {:& props} label))))))))
