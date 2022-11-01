@@ -100,7 +100,9 @@
                              [wrap-inertia-share context]
                              [inertia/wrap-inertia template asset-version]]}})
        (reitit.ring/routes
-        (reitit.ring/create-file-handler {:path "/"})
+        (reitit.ring/create-file-handler {:root "public"
+                                          ;; :root "public-prod"
+                                          :path "/"})
         (reitit.ring/create-default-handler
          {:not-found not-found-inertia})))
       ;; Prone must be a top level middleware

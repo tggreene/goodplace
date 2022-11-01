@@ -21,6 +21,7 @@
 
         :compiler-options {:source-map true}
         :release {:output-dir "target/release"}
+        ;; :release {:output-dir "public-prod/js"}
         :build-hooks [(shadow.cljs.build-report/hook)]
         :devtools {:preloads [hashp.core
                               hashc.core

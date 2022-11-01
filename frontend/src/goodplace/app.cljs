@@ -16,11 +16,9 @@
   {:home pages/Home
    :about pages/About
    :login pages/Login
-
    :users pages/Users
    :edit-user pages/EditUser
    :create-user pages/CreateUser
-
    :notes pages/Notes
    :view-note pages/ViewNote
    :edit-note pages/EditNote

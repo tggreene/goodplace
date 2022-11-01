@@ -43,7 +43,7 @@
   (fn [request]
     (let [note-id (get-in request [:path-params :note-id])
           note (:body-params request)]
-      (model/update-note! postgres note)
+      (model/update-note! postgres (assoc note :id note-id))
       (response/redirect
        (routes/get-route-path :view-note {:note-id note-id})
        :see-other))))
