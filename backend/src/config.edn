@@ -15,8 +15,10 @@
                               :user "postgres"
                               :password #env DB_PASSWORD
                               :port 5432
-                              :host "goodplace-db.internal"}}}
+                              :host "goodplace-db.internal"}}
+    :depends-on #profile {:dev #ig/ref :goodplace.dev.db/postgres-server
+                          :default nil}}
    :goodplace.migrations/migrations
    {:postgres #ig/ref :goodplace.db/postgres-client}}
   #profile {:dev {:goodplace.dev.db/postgres-server nil}
-            :default {}}]}
+            :default nil}]}
