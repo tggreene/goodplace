@@ -22,9 +22,11 @@ and lags further behind.
 - [x] Separate handlers into namespaces
 - [x] Use postgres for notes too
 - [x] Remove old sqlite implementations
-- [ ] Fix broken symbols in prod
-- [ ] Use production postgres
-- [ ] Mobile views
+- [x] Fix broken symbols in prod
+- [x] Use production postgres
+- [x] Separate pages into namespaces
+- [ ] Mobile/Responsive views
+- [ ] CapacitorJS?
 - [ ] Add rationale for GoodPlace
 - [ ] Add authorization for routes
 - [ ] Do more to split development time dependencies
@@ -33,7 +35,6 @@ and lags further behind.
 - [ ] Improve appearance of side menu
 - [ ] Add individual pages for server errors
 - [ ] Add components to wrap inertia links, buttons
-- [ ] Separate pages into namespaces
 
 ## Adding a new page or route
 
