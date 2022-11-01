@@ -53,10 +53,7 @@
 
 (defn create-note!
   [db note]
-  (let [id (random-uuid)
-        note (-> note
-                 (assoc :id id)
-                 (update :user_id coerce/to-int))
+  (let [note (update note :user_id coerce/to-int)
         query (h/format {:insert-into :notes
                          :values [note]
                          :returning [:id]
@@ -122,12 +119,6 @@
     :title "Test"
     :contents "Something something"})
 
-  (create-note!
-   db
-   {:user 1
-    :title "My Thoughts About Blah Blah Blah"
-    :contents "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."})
-
   (get-note-by-id db "d6012295-c3e5-4961-a529-b95f20121065")
 
   (hard-delete-note! db "5546f503-2c4e-49c9-8ba6-4a5e380c9fde")
@@ -153,5 +144,11 @@
   (create-notes-table-postgres! pg)
 
   (destroy-notes-table! pg)
+
+  (count (list-all-notes pg))
+
+  (doseq [{:keys [id]} (list-all-notes pg)]
+    #p id
+    #p (hard-delete-note! pg id))
 
   )
