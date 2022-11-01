@@ -2,12 +2,13 @@
   (:require [clojure.string :as str]
             [crypto.password.bcrypt :as password]
             [goodplace.examples.cities]
+            [goodplace.handlers.users :as users]
             [goodplace.models.notes :as notes]
-            [goodplace.models.users :as users]
+            [goodplace.models.users :as users-model]
             [goodplace.shared.routes :as routes]
+            [goodplace.utils.pagination :as pagination]
             [inertia.middleware :as inertia]
-            [ring.util.response :as response]
-            [goodplace.utils.pagination :as pagination]))
+            [ring.util.response :as response]))
 
 (defn get-user
   [request]
@@ -30,7 +31,7 @@
   (fn [request]
     (let [email (-> request :body-params :email)
           password (-> request :body-params :password)
-          user (users/get-user-by-email db email)
+          user (users-model/get-user-by-email db email)
           sanitized-user (dissoc user :password)
           session (:session request)]
       (if (and user (password/check password (:password user)))
@@ -54,71 +55,6 @@
       (assoc :session nil)))
 
 (def per-page 10)
-
-(defn users
-  [{:keys [db]}]
-  (fn [{:keys [params query-string uri] :as request}]
-    (let [all-users (users/list-users db)
-          page (Integer/parseInt (get params :page "1"))
-          offset (* (dec page) per-page)
-          count (count all-users)
-          users (->> all-users
-                     (drop offset)
-                     (take per-page))
-          props {:users {:data users
-                         :current_page page
-                         :links (pagination/links uri query-string page count per-page)}}]
-      (inertia/render :users props))))
-
-(defn edit-user-get
-  [{:keys [db]}]
-  (fn [request]
-    (let [user-id (get-in request [:path-params :user-id])
-          user (users/get-user-by-id db user-id)]
-      (inertia/render :edit-user {:user user}))))
-
-(defn check-passwords-match
-  [{:keys [password password2]}]
-  (= password password2))
-
-(defn sanitize-create-user
-  [user]
-  (dissoc user :password2))
-
-(defn edit-user-post
-  [{:keys [db]}]
-  (fn [request]
-    (let [user-id (get-in request [:path-params :user-id])
-          user (assoc (:body-params request) :id user-id)]
-      (if (check-passwords-match user)
-        (do
-          (users/update-user! db (sanitize-create-user user))
-          (response/redirect (routes/get-route-path :users) :see-other))
-        (-> (response/redirect (routes/get-route-path :edit-user {:user-id user-id}))
-            (assoc :flash
-                   {:error
-                    {:password "Passwords don't match"}}))))))
-
-(defn create-user-post
-  [{:keys [db]}]
-  (fn [request]
-    (let [user (:body-params request)]
-      (if (check-passwords-match user)
-        (do
-          (users/create-user! db (sanitize-create-user user))
-          (response/redirect (routes/get-route-path :users) :see-other))
-        (-> (response/redirect (routes/get-route-path :create-user))
-            (assoc :flash
-                   {:error
-                    {:password "Passwords don't match"}}))))))
-
-(defn delete-user
-  [{:keys [db]}]
-  (fn [request]
-    (let [user (get-user request)
-          user-id (get-in request [:path-params :user-id])]
-      (users/soft-delete-user! db user-id)
-      (response/redirect (routes/get-route-path :users) :see-other))))
 
 (defn notes
   [{:keys [db]}]
@@ -193,3 +129,33 @@
                           :links (pagination/links uri query-string page count 10)}
                  :filters filters}]
       (inertia/render :cities props))))
+
+(defn inertia-handler
+  ([id]
+   (fn [_]
+     (inertia/render id)))
+  ([id props]
+   (fn [_]
+     (inertia/render id props))))
+
+(defn handlers
+  [context]
+  {:home {:get {:handler (inertia-handler :home)}}
+   :login {:get {:handler login}
+           :post {:handler (authenticate context)}}
+   :logout {:get {:handler logout}}
+   :users {:get {:handler (users/list-users context)}}
+   :edit-user {:get {:handler (users/edit-user-get context)}
+               :post {:handler (users/edit-user-post context)}}
+   :create-user {:get {:handler (inertia-handler :create-user)}
+                 :post {:handler (users/create-user-post context)}}
+   :delete-user {:delete {:handler (users/delete-user context)}}
+   :notes {:get {:handler (notes context)}}
+   :view-note {:get {:handler (view-note context)}}
+   :edit-note {:get {:handler (edit-note-get context)}
+               :post {:handler (edit-note-post context)}}
+   :create-note {:get {:handler (inertia-handler :create-note)}
+                 :post {:handler (create-note-post context)}}
+   :delete-note {:delete {:handler (delete-note context)}}
+   :cities {:get {:handler (cities context)}}
+   :something-wrong {:get {:handler (inertia-handler :something-wrong)}}})

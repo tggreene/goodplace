@@ -1,10 +1,18 @@
 {:ig/system
- {:goodplace.main/server
-  {:port #profile {:dev 8090
-                   :default 8080}
-   :dynamic? #profile {:dev true
-                      :default false}
-   :db #ig/ref :goodplace.db/db}
-  :goodplace.db/db
-  {:db-spec {:dbtype "sqlite"
-             :dbname "resources/db/db.sqlite"}}}}
+ #merge
+ [{:goodplace.main/server
+   {:port #profile {:dev 8090
+                    :default 8080}
+    :dynamic? #profile {:dev true
+                        :default false}
+    :db #ig/ref :goodplace.db/db
+    :postgres #ig/ref :goodplace.db/postgres-client}
+   :goodplace.db/db
+   {:db-spec {:dbtype "sqlite"
+              :dbname "resources/db/db.sqlite"}}
+   :goodplace.db/postgres-client
+   {:db-spec #profile {:dev {:dbtype "postgres"
+                             :user "postgres"
+                             :password "postgres"
+                             :port 5432}}}}
+  #profile {:dev {:goodplace.db/postgres-server nil}}]}

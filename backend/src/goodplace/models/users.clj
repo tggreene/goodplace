@@ -1,11 +1,13 @@
 (ns goodplace.models.users
   (:require [crypto.password.bcrypt :as password]
+            [goodplace.utils.coerce :as coerce]
             [honey.sql :as h]
             [honey.sql.helpers :refer [where]]
             [next.jdbc :as jdbc]
             [next.jdbc.sql :as sql]))
 
-(defn create-users-table!
+;; sqlite
+(defn create-users-table-sqlite!
   [db]
   (jdbc/execute!
    db
@@ -20,6 +22,25 @@
          "  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
          "  deleted_at DATETIME\n"
          ");")]))
+
+;; postgres
+(defn create-users-table-postgres!
+  [db]
+  (jdbc/execute!
+   db
+   [(str "CREATE TABLE users (\n"
+         "  id SERIAL PRIMARY KEY,\n"
+         "  first_name TEXT NOT NULL,\n"
+         "  last_name TEXT NOT NULL,\n"
+         "  username TEXT NOT NULL UNIQUE,\n"
+         "  email TEXT NOT NULL UNIQUE,\n"
+         "  password TEXT NOT NULL UNIQUE,\n"
+         "  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n"
+         "  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n"
+         "  deleted_at TIMESTAMP\n"
+         ");")]))
+
+(def create-users-table! create-users-table-sqlite!)
 
 (defn destroy-users-table!
   [db]
@@ -36,18 +57,31 @@
                          :values [encrypted-user]})]
     (jdbc/execute! db query)))
 
+(defn create-user-postgres!
+  [db user]
+  (let [encrypted-user (cond-> user
+                         (:password user)
+                         (update :password password/encrypt))
+        query (h/format {:insert-into :users
+                         :values [encrypted-user]})]
+    (jdbc/execute! db query)))
+
 (defn sanitize-user
   [user]
   (dissoc user :password))
 
 (defn update-user!
-  [db {:keys [id] :as user}]
-  (let [encrypted-user (cond-> user
-                         (:password user)
-                         (update :password password/encrypt))
+  [db user]
+  (let [{:keys [id]
+         :as encrypted-user} (cond-> user
+                               :always
+                               (update :id coerce/to-int)
+                               (:password user)
+                               (update :password password/encrypt))
         query (h/format {:update :users
-                         :set (merge encrypted-user
-                                     {:updated_at :current_timestamp})
+                         :set (-> encrypted-user
+                                  (dissoc :id)
+                                  (assoc :updated_at :current_timestamp))
                          :where [:= :id id]})]
     (jdbc/execute! db query)))
 
@@ -56,7 +90,7 @@
   (let [query (h/format {:update :users
                          :set {:deleted_at :current_timestamp
                                :updated_at :current_timestamp}
-                         :where [:= :id id]})]
+                         :where [:= :id (coerce/to-int id)]})]
     (jdbc/execute-one! db query)))
 
 (defn restore-deleted-user!
@@ -64,7 +98,7 @@
   (let [query (h/format {:update :users
                          :set {:deleted_at nil
                                :updated_at :current_timestamp}
-                         :where [:= :id id]})]
+                         :where [:= :id (coerce/to-int id)]})]
     (jdbc/execute-one! db query)))
 
 (defn hard-delete-user!
@@ -72,12 +106,13 @@
   (let [query (h/format {:update :users
                          :set {:deleted_at nil
                                :updated_at :current_timestamp}
-                         :where [:= :id id]})]
+                         :where [:= :id (coerce/to-int id)]})]
     (jdbc/execute-one! db query)))
 
 (defn list-users
   [db]
-  (let [query (h/format {:select [:id :first_name :last_name :email :created_at]
+  (let [query (h/format {:select [:id :first_name :last_name :username :email
+                                  :created_at :updated_at]
                          :from [:users]
                          :where [:= :deleted_at nil]
                          :order-by [:id]})]
@@ -87,7 +122,7 @@
   [db id]
   (let [query (h/format {:select [:*]
                          :from [:users]
-                         :where [:= :id id]})]
+                         :where [:= :id (coerce/to-int id)]})]
     (jdbc/execute-one! db query)))
 
 (defn get-user-by-email
@@ -117,5 +152,34 @@
     :username "tggreene"
     :email "tim.g.greene@gmail.com"
     :password "password"})
+
+  )
+
+(comment
+  (def db (:goodplace.db/db integrant.repl.state/system))
+
+  (def pg (:goodplace.db/postgres-client integrant.repl.state/system))
+
+  (prn pg)
+
+  (list-users db)
+
+  (get-user-by-id db 1)
+
+  (create-users-table db)
+
+  (destroy-users-table db)
+
+  (restore-deleted-user! db 1)
+
+  (create-users-table-postgres! pg)
+
+  (doseq [user (list-users db)
+          :let [user (-> user
+                         (dissoc :id :created_at)
+                         (assoc :password "password"))]]
+    (create-user! pg user))
+
+  (clojure.pprint/pprint (list-users pg))
 
   )

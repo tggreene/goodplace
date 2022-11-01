@@ -130,6 +130,7 @@
                                     (str/replace path (str param) value))
                                   %
                                   params)))))
+
 (defn get-route-path
   ([id]
    (:path (get-route id)))

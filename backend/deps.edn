@@ -19,15 +19,17 @@
   buddy/buddy-auth {:mvn/version "3.0.323"}
   org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"}
   funcool/struct {:mvn/version "1.4.0"}
-  metosin/reitit {:mvn/version "0.5.18"}}
+  metosin/reitit {:mvn/version "0.5.18"}
+  org.postgresql/postgresql {:mvn/version "42.5.0"}
+  prone/prone {:mvn/version "2021-04-23"}}
 
  :aliases
  {:dev
   {:extra-paths ["dev/src"]
    :extra-deps {integrant/repl {:mvn/version "0.3.2"}
                 com.github.tggreene/integrant-repl-autoreload {:mvn/version "0.2.0"}
-                tggreene/integrant-repl-autoreload
-                {:local/root "../../integrant-repl-autoreload"}}
+                org.clojars.bigsy/pg-embedded-clj {:mvn/version "1.0.0"}
+                org.postgresql/postgresql {:mvn/version "42.5.0"}}
    ;; with auto-reset
    :main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace.dev/go),(goodplace.dev/auto-reset)"]
    ;; without auto-reset

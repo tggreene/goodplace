@@ -15,9 +15,11 @@ and lags further behind.
 - [x] Reimplement cljs friendly hooks for inertia
 - [x] Fork out inertia wrapping into new library
 - [x] Add titles to pages
-- [ ] Produce jar of application
-- [ ] Deployment (fly.io)
-- [ ] Improve error feedback development time
+- [x] Produce jar of application
+- [x] Deployment (fly.io)
+- [ ] Fix broken symbols in prod
+- [ ] Add local postgres
+- [x] Improve error feedback development time
 - [ ] Add authorization for routes
 - [ ] Maybe do more to split development time dependencies
 - [ ] CI (Github Actions)

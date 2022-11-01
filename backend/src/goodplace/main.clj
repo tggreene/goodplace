@@ -3,7 +3,7 @@
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :as bam]
             [easy.system :as es]
-            [goodplace.handlers :as handlers]
+            [goodplace.handlers :refer [handlers]]
             [goodplace.middleware :as mw]
             [goodplace.models.users :as users]
             [goodplace.shared.routes :as routes]
@@ -23,6 +23,7 @@
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.middleware.stacktrace :refer [wrap-stacktrace]]
+            [prone.middleware :as prone]
             [jsonista.core :as json])
   (:gen-class))
 
@@ -37,34 +38,10 @@
 (comment
   (inertia/render "something"))
 
-(defn route-implementations
-  [context]
-  {:home {:get {:handler (inertia-handler :home)}}
-   :login {:get {:handler handlers/login}
-           :post {:handler (handlers/authenticate context)}}
-   :logout {:get {:handler handlers/logout}}
-
-   :users {:get {:handler (handlers/users context)}}
-   :edit-user {:get {:handler (handlers/edit-user-get context)}
-               :post {:handler (handlers/edit-user-post context)}}
-   :create-user {:get {:handler (inertia-handler :create-user)}
-                 :post {:handler (handlers/create-user-post context)}}
-   :delete-user {:delete {:handler (handlers/delete-user context)}}
-
-   :notes {:get {:handler (handlers/notes context)}}
-   :view-note {:get {:handler (handlers/view-note context)}}
-   :edit-note {:get {:handler (handlers/edit-note-get context)}
-               :post {:handler (handlers/edit-note-post context)}}
-   :create-note {:get {:handler (inertia-handler :create-note)}
-                 :post {:handler (handlers/create-note-post context)}}
-   :delete-note {:delete {:handler (handlers/delete-note context)}}
-   :cities {:get {:handler (handlers/cities context)}}
-   :something-wrong {:get {:handler (inertia-handler :something-wrong)}}})
-
-(defn check-route-implementations
-  [context]
+(defn check-handlers
+  [handlers context]
   (->> routes/routes
-       (remove #(contains? (route-implementations context) (:id %)))
+       (remove #(contains? (handlers context) (:id %)))
        (run! #(println "No route implementation found for" (:id %)))))
 
 (def asset-version "1")
@@ -85,48 +62,55 @@
       (handler (assoc request :inertia-share props)))))
 
 (defn create-reitit-routes
-  [routes impls]
+  [routes handlers]
   (reduce (fn [res {:keys [id path]}]
             (conj res
-                  [path (get impls id)]))
+                  [path (get handlers id)]))
           []
           routes))
 
+(def not-found-inertia
+  (-> (fn [request]
+        (inertia/render :something-wrong
+                        {:errors ["Page not found"]
+                         :redirect (routes/get-route-path :home)}))
+      (inertia/wrap-inertia template asset-version)))
+
+(def not-found-plain
+  (constantly {:status 404, :body "Page Not Found"}))
+
 (defn handler
-  [{:keys [db] :as context}]
-  (reitit.ring/ring-handler
-   (reitit.ring/router
-    (create-reitit-routes routes/routes (route-implementations context))
-    {:conflicts nil
-     :exception pretty/exception
-     :data {:coercion schema-coercion/coercion
-            :middleware [params/parameters-middleware
-                         rrc/coerce-exceptions-middleware
-                         rrc/coerce-request-middleware
-                         rrc/coerce-response-middleware
-                         wrap-keyword-params
-                         [wrap-session
-                          {:store (cookie-store {:key cookie-store-secret})}]
-                         wrap-flash
-                         [bam/wrap-authentication backend]
-                         mw/wrap-auth
-                         [wrap-inertia-share context]
-                         [inertia/wrap-inertia template asset-version]]}})
-   (reitit.ring/routes
-    (reitit.ring/create-file-handler {:path "/"})
-    (reitit.ring/create-default-handler
-     {:not-found
-      (->
-       (fn [request]
-         (inertia/render :something-wrong {:errors ["Page not found"]
-                                           :redirect (routes/get-route-path :home)}))
-       (inertia/wrap-inertia template asset-version))}))))
+  [context]
+  (-> (reitit.ring/ring-handler
+       (reitit.ring/router
+        (create-reitit-routes routes/routes (handlers context))
+        {:conflicts nil
+         :exception pretty/exception
+         :data {:coercion schema-coercion/coercion
+                :middleware [params/parameters-middleware
+                             rrc/coerce-exceptions-middleware
+                             rrc/coerce-request-middleware
+                             rrc/coerce-response-middleware
+                             wrap-keyword-params
+                             [wrap-session
+                              {:store (cookie-store {:key cookie-store-secret})}]
+                             wrap-flash
+                             [bam/wrap-authentication backend]
+                             mw/wrap-auth
+                             [wrap-inertia-share context]
+                             [inertia/wrap-inertia template asset-version]]}})
+       (reitit.ring/routes
+        (reitit.ring/create-file-handler {:path "/"})
+        (reitit.ring/create-default-handler
+         {:not-found not-found-inertia})))
+      (prone/wrap-exceptions {:app-namespaces ['goodplace]})))
 
 (defmethod ig/init-key ::server
-  [_ {:keys [port dynamic? db] :as opts}]
+  [_ {:keys [port dynamic? db postgres] :as opts}]
   (log/infof "Starting Server {port: %d}" port)
-  (let [context {:db db}]
-    (check-route-implementations context)
+  (let [context {:db db
+                 :postgres postgres}]
+    (check-handlers handlers context)
     (jetty/run-jetty
      (if dynamic?
        (fn [request]
