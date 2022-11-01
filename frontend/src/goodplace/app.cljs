@@ -4,7 +4,7 @@
    ["@inertiajs/progress" :refer [InertiaProgress]]
    ["@chakra-ui/react" :refer [ChakraProvider]]
    [goodplace.layouts :as layouts]
-   [goodplace.pages :as pages]
+   [goodplace.pages :refer [page-components]]
    [goodplace.shared.routes :as routes]
    [tggreene.inertia-cljs :as inertia-cljs]
    [tggreene.inertia-cljs.impl.react18 :as inertia-cljs-react]
@@ -12,24 +12,10 @@
    [clojure.walk :as walk]
    [potpuri.core :as potpuri]))
 
-(def page-implementations
-  {:home pages/Home
-   :about pages/About
-   :login pages/Login
-   :users pages/Users
-   :edit-user pages/EditUser
-   :create-user pages/CreateUser
-   :notes pages/Notes
-   :view-note pages/ViewNote
-   :edit-note pages/EditNote
-   :create-note pages/CreateNote
-   :cities pages/Cities
-   :something-wrong pages/SomethingWrong})
-
 (def pages
   (reduce (fn [pages {:keys [id] :as page}]
             (conj pages
-                  (if-let [impl (get page-implementations id)]
+                  (if-let [impl (get page-components id)]
                     (assoc page :impl impl)
                     page)))
           []
@@ -38,11 +24,11 @@
 (def indexed-pages
   (potpuri/index-by :id pages))
 
-(defn check-page-implementations!
+(defn check-page-components!
   []
   (->> pages
        (remove :impl)
-       (run! #(js/console.warn (str "No page implementation for " (:id %))))))
+       (run! #(js/console.warn (str "No page component for " (:id %))))))
 
 (defn setup-inertia
   []
@@ -56,7 +42,7 @@
 
 (defn start!
   []
-  (check-page-implementations!)
+  (check-page-components!)
   (setup-inertia))
 
 (start!)
