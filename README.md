@@ -21,8 +21,9 @@ and lags further behind.
 - [x] Add local postgres
 - [x] Separate handlers into namespaces
 - [x] Use postgres for notes too
-- [ ] Remove old sqlite implementations
+- [x] Remove old sqlite implementations
 - [ ] Fix broken symbols in prod
+- [ ] Use production postgres
 - [ ] Add rationale for GoodPlace
 - [ ] Add authorization for routes
 - [ ] Do more to split development time dependencies

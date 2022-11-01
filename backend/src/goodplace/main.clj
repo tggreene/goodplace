@@ -49,10 +49,10 @@
 (def backend (backends/session))
 
 (defn wrap-inertia-share
-  [handler {:keys [db] :as context}]
+  [handler {:keys [postgres] :as context}]
   (fn [request]
     (let [user-id (-> request :session :identity :id)
-          user (users/get-user-by-id db user-id)
+          user (users/get-user-by-id postgres user-id)
           success (-> request :flash :success)
           errors (-> request :flash :error)
           props {:errors (or errors {})
