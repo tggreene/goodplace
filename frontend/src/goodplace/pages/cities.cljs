@@ -42,7 +42,9 @@
                             :href url}
                (let [props (cond-> {:minWidth 14
                                     :m 1}
-                             active (merge {:colorScheme "blue"})
+                             active (merge {:bg "blue.100"
+                                            :_hover #js
+                                            {:bg "blue.200"}})
                              (not url) (merge {:disabled true}))]
                  ($ Button {:& props} label))))))))
 
