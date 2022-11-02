@@ -77,6 +77,17 @@
     user (remove #(= :login (:id %)))
     (not user) (remove :authenticated?)))
 
+(defnc NavigationItem
+  [{:keys [path name]}]
+  ($ InertiaLink {:as "span"
+                  :href path}
+     ($ Button {:bg "white"
+                :borderRadius 0
+                :width "100%"
+                :justifyContent "flex-start"
+                :px 8
+                :py 8} name)))
+
 (defnc NavigationMenu
   [{:keys [user pages menuOpen]}]
   (let [pages (filter-pages {:user user} pages)]
@@ -92,19 +103,13 @@
                 :width "xs"
                 :bg "white"
                 :direction "column"
-                :py 6
-                :px 8
-                :gap 4
                 & (when menuOpen
                     {:borderRightWidth 1
                      :borderRightColor "gray.100"
                      :borderRightStyle "solid"
                      :boxShadow "xs"})}
-          (for [{:keys [id path name]} pages]
-            ($ InertiaLink {:as "span"
-                            :key id
-                            :href path}
-               ($ Link name)))))))
+          (for [page pages]
+            ($ NavigationItem {:& page}))))))
 
 (defnc Default
   [{:keys [pages children]}]
