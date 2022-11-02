@@ -59,7 +59,7 @@
                          :returning [:id]
                          :on-conflict [:id]
                          :do-nothing []})]
-    (jdbc/execute! db query)))
+    (jdbc/execute-one! db query)))
 
 (defn update-note!
   [db {:keys [id] :as note}]

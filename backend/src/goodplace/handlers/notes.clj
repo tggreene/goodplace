@@ -55,9 +55,10 @@
           note (:body-params request)
           {:keys [id] :as new-note}
           (model/create-note! postgres
-                              (assoc note :user (:id user)))]
+                              (assoc note :user_id (:id user)))
+          id (str id)]
       (response/redirect
-       (routes/get-route-path :view-note {:note-id id})
+       (routes/get-route-path :notes)
        :see-other))))
 
 (defn delete-note
