@@ -19,8 +19,7 @@
            with-out-str))))
 
 (defnc PageTemplate
-  [{:keys [title children] :as props}]
-  #p props
+  [{:keys [title children]}]
   (<>
    ($ Head {:title title})
    ($ Flex {:direction "column"
