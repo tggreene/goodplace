@@ -1,10 +1,16 @@
 # GoodPlace
 
+<img src=".repo/goodplace.png"
+     alt="goodplace homepage"
+     width="60%"
+     style="margin-left: auto; margin-right: auto; display: block;" />
+
 A rough project based on some learnings from pingcrm from PrestanceDesign but
 with ChakraUI as the UI framework.
 
 Leaning away from closure compiler for JS assets as it grows more incompatible
-and lags further behind.
+with contemporary JS.
+
 
 ## Todo
 
@@ -27,11 +33,14 @@ and lags further behind.
 - [x] Separate pages into namespaces
 - [x] Mobile/Responsive views
 - [x] CapacitorJS?
+- [ ] Reduce bulk of pages namespaces
+- [ ] Improve tests
+- [ ] Improve build
+- [ ] Improve usability
 - [ ] Add rationale for GoodPlace
 - [ ] Add authorization for routes
 - [ ] Do more to split development time dependencies
 - [ ] CI tests (Github Actions)
-- [ ] Improve tests
 - [ ] Improve appearance of side menu
 - [ ] Add individual pages for server errors
 - [ ] Add components to wrap inertia links, buttons
