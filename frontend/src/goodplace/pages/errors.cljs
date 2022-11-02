@@ -1,27 +1,17 @@
 (ns goodplace.pages.errors
   (:require
-   ["@chakra-ui/react"
-    :refer
-    [Box Flex Heading Button Container Text Input Table Thead
-     Tbody Tfoot Tr Th Td TabelCaption TableContainer
-     Stack HStack VStack useToast FormControl FormLabel Textarea
-     CircularProgress]]
-   ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage useForm]]
+   ["@chakra-ui/react" :refer [Box Container useToast]]
    [helix.core :refer [defnc $ <>]]
    [helix.hooks :as hooks]
    [goodplace.components :refer [CircularProgressTimed]]
    [goodplace.pages.common :refer [PageTemplate]]
-   [goodplace.shared.copy :as copy]
-   [goodplace.shared.routes :as routes]
-   [applied-science.js-interop :as j]
-   [clojure.pprint :refer [pprint]]
    [tggreene.inertia-cljs :as inertia-cljs]))
 
 (defnc SomethingWrong
   []
-  (let [page (usePage)
-        errors (js->clj (j/get-in page [:props :errors]))
-        redirect (j/get-in page [:props :redirect])
+  (let [page (inertia-cljs/use-page)
+        errors (get-in page [:props :errors])
+        redirect (get-in page [:props :redirect])
         toast (useToast)
         redirect-ms 3500]
     (hooks/use-effect

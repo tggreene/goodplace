@@ -2,17 +2,11 @@
   (:require
    ["@chakra-ui/react"
     :refer
-    [Box Flex Heading Button Container Text Input Table Thead
-     Tbody Tfoot Tr Th Td TabelCaption TableContainer
-     Stack HStack VStack useToast FormControl FormLabel Textarea
-     CircularProgress]]
-   ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage useForm]]
+    [Box Button Table Thead Tbody Tr Th Td TableContainer HStack VStack]]
+   ["@inertiajs/inertia-react" :refer [InertiaLink]]
    [helix.core :refer [defnc $ <>]]
-   [helix.hooks :as hooks]
    [goodplace.pages.common :refer [PageTemplate]]
    [goodplace.shared.routes :as routes]
-   [applied-science.js-interop :as j]
-   [clojure.pprint :refer [pprint]]
    [tggreene.inertia-cljs :as inertia-cljs]))
 
 (defnc CitiesTable
@@ -26,13 +20,15 @@
           ($ Table {:variant "simple"}
              ($ Thead
                 ($ Tr
-                   ($ Th {:minWidth "md"} "City")
+                   ($ Th {:minWidth #js {:base "initial"
+                                         :lg "md"}}
+                      "City")
                    ($ Th "Country")
                    ($ Th "Latitude")
                    ($ Th "Longitude")))
              ($ Tbody
                 (for [city data
-                      :let [{:keys [name country lat lng]} (j/lookup city)]]
+                      :let [{:keys [name country lat lng]} city]]
                   ($ Tr {:key (str name "-" lat "-" lng)}
                      ($ Td name)
                      ($ Td country)
@@ -41,7 +37,7 @@
        ($ HStack {:display "flex"
                   :flexWrap #js ["wrap" nil]}
           (for [link links
-                :let [{:keys [url label active]} (j/lookup link)]]
+                :let [{:keys [url label active]} link]]
             ($ InertiaLink {:key (str url label)
                             :href url}
                (let [props (cond-> {:minWidth 14
@@ -52,8 +48,7 @@
 
 (defnc Cities
   []
-  (let [cities (-> (usePage)
-                   (j/get-in [:props :cities])
-                   (j/lookup))]
+  (let [cities (-> (inertia-cljs/use-page)
+                   (get-in [:props :cities]))]
     ($ PageTemplate {:title "Cities"}
        ($ CitiesTable {:cities cities}))))

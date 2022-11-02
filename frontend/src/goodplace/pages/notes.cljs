@@ -2,17 +2,12 @@
   (:require
    ["@chakra-ui/react"
     :refer
-    [Box Flex Heading Button Container Text Input Table Thead
-     Tbody Tfoot Tr Th Td TabelCaption TableContainer
-     Stack HStack VStack useToast FormControl FormLabel Textarea
-     CircularProgress]]
-   ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage useForm]]
+    [Box Flex Heading Button Text Input HStack Toast FormControl FormLabel
+     Textarea]]
+   ["@inertiajs/inertia-react" :refer [InertiaLink]]
    [helix.core :refer [defnc $ <>]]
-   [helix.hooks :as hooks]
    [goodplace.pages.common :refer [PageTemplate]]
    [goodplace.shared.routes :as routes]
-   [applied-science.js-interop :as j]
-   [clojure.pprint :refer [pprint]]
    [tggreene.inertia-cljs :as inertia-cljs]))
 
 (defn truncate-ellipsis
@@ -41,7 +36,7 @@
 
 (defnc Notes
   []
-  (let [notes (j/get-in (usePage) [:props :notes])]
+  (let [notes (get-in (inertia-cljs/use-page) [:props :notes])]
     ($ PageTemplate {:title "Notes"}
        (map Note notes)
        ($ HStack {:mt 4}
@@ -51,8 +46,8 @@
 
 (defnc ViewNote
   []
-  (let [note (j/get-in (usePage) [:props :note])
-        {:keys [id title contents]} (j/lookup note)]
+  (let [{:keys [id title contents] :as note}
+        (get-in (inertia-cljs/use-page) [:props :note])]
     ($ PageTemplate {:title "Note"}
        ($ Flex {:direction "column"
                 :gap 1

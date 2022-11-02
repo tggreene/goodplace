@@ -11,7 +11,6 @@ with ChakraUI as the UI framework.
 Leaning away from closure compiler for JS assets as it grows more incompatible
 with contemporary JS.
 
-
 ## Todo
 
 - [x] Add easy running of cljs, js parts
@@ -33,11 +32,12 @@ with contemporary JS.
 - [x] Separate pages into namespaces
 - [x] Mobile/Responsive views
 - [x] CapacitorJS?
-- [ ] Reduce bulk of pages namespaces
-- [ ] Improve tests
+- [x] Improve tests
+- [x] Reduce bulk of pages namespaces
 - [ ] Improve build
 - [ ] Improve usability
 - [ ] Add rationale for GoodPlace
+- [ ] Add Getting Started documentation
 - [ ] Add authorization for routes
 - [ ] Do more to split development time dependencies
 - [ ] CI tests (Github Actions)

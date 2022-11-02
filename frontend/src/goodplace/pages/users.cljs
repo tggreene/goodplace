@@ -2,17 +2,13 @@
   (:require
    ["@chakra-ui/react"
     :refer
-    [Box Flex Heading Button Container Text Input Table Thead
-     Tbody Tfoot Tr Th Td TabelCaption TableContainer
-     Stack HStack VStack useToast FormControl FormLabel Textarea
-     CircularProgress]]
-   ["@inertiajs/inertia-react" :refer [Head InertiaLink usePage useForm]]
+    [Box Flex Button Container Text Input Table Thead Tbody Tr Th Td
+     TableContainer Stack HStack VStack FormControl FormLabel Textarea]]
+   ["@inertiajs/inertia-react" :refer [InertiaLink]]
    [helix.core :refer [defnc $ <>]]
    [helix.hooks :as hooks]
    [goodplace.pages.common :refer [PageTemplate]]
    [goodplace.shared.routes :as routes]
-   [applied-science.js-interop :as j]
-   [clojure.pprint :refer [pprint]]
    [tggreene.inertia-cljs :as inertia-cljs]))
 
 (defnc UsersTable
@@ -42,7 +38,7 @@
              ($ Tbody
                 (for [user data
                       :let [{:keys [id first_name last_name email created_at]}
-                            (j/lookup user)
+                            user
                             name (str first_name " " last_name)]]
                   ($ Tr {:key email}
                      ($ Td name)
@@ -63,7 +59,7 @@
                                  "Delete User")))))))))
        ($ HStack
           (for [link links
-                :let [{:keys [url label active]} (j/lookup link)]]
+                :let [{:keys [url label active]} link]]
             ($ InertiaLink {:key (str url label)
                             :href url}
                (let [props (cond-> {:minWidth 14}
@@ -73,9 +69,8 @@
 
 (defnc Users
   []
-  (let [users (-> (usePage)
-                   (j/get-in [:props :users])
-                   (j/lookup))]
+  (let [users (-> (inertia-cljs/use-page)
+                  (get-in [:props :users]))]
     ($ PageTemplate {:title "Users"}
        ($ UsersTable {:users users}))))
 
