@@ -6,3 +6,6 @@
 **/.shadow-cljs
 **/classes
 **/cljs-runtime
+frontend/libs
+mobile/public
+mobile/ios
