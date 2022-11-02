@@ -10,7 +10,8 @@
         :dev {:output-dir "public/js"
               :closure-defines {goog.DEBUG true}
               :compiler-options
-              {:output-feature-set :es-next}}
+              {;; TODO Do we need this?
+               :output-feature-set :es-next}}
         :js-options {:resolve
                      {"babelHelpers"
                       {:target :npm
@@ -18,7 +19,6 @@
                       "http2" false}
                      :js-provider :external
                      :external-index "target/index.js"}
-
         :compiler-options {:source-map true}
         :release {:output-dir "target/release"}
         ;; :release {:output-dir "public-prod/js"}

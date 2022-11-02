@@ -25,8 +25,8 @@ and lags further behind.
 - [x] Fix broken symbols in prod
 - [x] Use production postgres
 - [x] Separate pages into namespaces
-- [ ] Mobile/Responsive views
-- [ ] CapacitorJS?
+- [x] Mobile/Responsive views
+- [x] CapacitorJS?
 - [ ] Add rationale for GoodPlace
 - [ ] Add authorization for routes
 - [ ] Do more to split development time dependencies

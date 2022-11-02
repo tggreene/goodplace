@@ -17,7 +17,8 @@
    [goodplace.components :refer [ResponsiveIndicator]]
    [goodplace.shared.routes :as routes]
    [applied-science.js-interop :as j]
-   [react :as react]))
+   [react :as react]
+   [goodplace.detect :as detect]))
 
 (def top-bar-height 14)
 (def top-bar-height-var "var(--chakra-sizes-14)")
@@ -112,7 +113,9 @@
     ($ Flex {:direction "column"
              :justify "center"
              :align "center"
-             :width "100%"}
+             :width "100%"
+             & (when detect/capacitor?
+                 {:mt "2rem"})}
        ($ TopBar {:user user
                   :setMenuOpen setMenuOpen
                   :menuOpen menuOpen})

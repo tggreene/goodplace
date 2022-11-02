@@ -13,3 +13,9 @@
 *.js.map
 .cache
 **/target/*
+# Ignore this as we need to sync it frequently
+mobile/public
+mobile/ios
+
+# Debugging npm libs
+frontend/libs
