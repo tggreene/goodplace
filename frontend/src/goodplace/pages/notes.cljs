@@ -20,7 +20,7 @@
        (str (subs s 0 max) "...")))))
 
 (defnc Note
-  [note]
+  [{:keys [note]}]
   (let [{:keys [id title contents]} note]
     ($ InertiaLink {:key id
                     :href (routes/get-route-path :view-note {:note-id id})}
@@ -38,7 +38,8 @@
   []
   (let [notes (get-in (inertia-cljs/use-page) [:props :notes])]
     ($ PageTemplate {:title "Notes"}
-       (map Note notes)
+       (for [note notes]
+         ($ Note {:note note}))
        ($ HStack {:mt 4}
           ($ InertiaLink {:href (routes/get-route-path :create-note)}
              ($ Button {:colorScheme "blue"}
