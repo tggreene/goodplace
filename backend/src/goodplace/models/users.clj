@@ -106,9 +106,7 @@
 
 (defn hard-delete-user!
   [db id]
-  (let [query (h/format {:update :users
-                         :set {:deleted_at nil
-                               :updated_at :current_timestamp}
+  (let [query (h/format {:delete-from :users
                          :where [:= :id (coerce/to-int id)]})]
     (jdbc/execute-one! db query)))
 
@@ -165,7 +163,7 @@
 
   (prn pg)
 
-  (list-users db)
+  (list-users pg)
 
   (get-user-by-id db 1)
 
@@ -184,5 +182,16 @@
     (create-user! pg user))
 
   (clojure.pprint/pprint (list-users pg))
+
+  (hard-delete-user! pg 5)
+
+  (create-user!
+   pg
+   {:email "x@y.z",
+    :first_name "x",
+    :last_name "y",
+    :password "password",
+    :username "z"}
+   )
 
   )

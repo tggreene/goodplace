@@ -29,6 +29,7 @@
         name (str first_name " " last_name)]
     ($ Menu
        ($ MenuButton {:as Button
+                      :data-test "user-menu"
                       :rightIcon ($ ChevronDownIcon)
                       :textOverflow "ellipsis"
                       :overflow "hidden"}
@@ -65,7 +66,8 @@
           (let [{:keys [path name]} (routes/get-route :login)]
             ($ InertiaLink {:href path}
                ($ Button {:textOverflow "ellipsis"
-                          :overflow "hidden"}
+                          :overflow "hidden"
+                          :data-test "login"}
                   name)))))))
 
 (defn filter-pages
@@ -88,15 +90,16 @@
                           :zIndex 10}}
        ($ Flex {:height "max(100%, 100vh)"
                 :width "xs"
-                :borderRightWidth 1
-                :borderRightColor "gray.100"
-                :borderRightStyle "solid"
-                :boxShadow "xs"
                 :bg "white"
                 :direction "column"
                 :py 6
                 :px 8
-                :gap 4}
+                :gap 4
+                & (when menuOpen
+                    {:borderRightWidth 1
+                     :borderRightColor "gray.100"
+                     :borderRightStyle "solid"
+                     :boxShadow "xs"})}
           (for [{:keys [id path name]} pages]
             ($ InertiaLink {:as "span"
                             :key id

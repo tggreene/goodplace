@@ -72,5 +72,5 @@
   (fn [request]
     (let [user (common/get-user request)
           user-id (get-in request [:path-params :user-id])]
-      (model/soft-delete-user! postgres user-id)
+      (model/hard-delete-user! postgres user-id)
       (response/redirect (routes/get-route-path :users) :see-other))))

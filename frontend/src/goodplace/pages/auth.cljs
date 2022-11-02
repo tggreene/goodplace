@@ -31,16 +31,20 @@
                    :p 2
                    :gap 2
                    :width #js ["xs" "md"]}
-             ($ Input {:type "text"
-                       :placeholder "Email"
-                       :value (.-email data)
-                       :onChange #(setData "email" (.. % -target -value))
-                       :maxWidth #js ["80%" "initial"]})
-             ($ Input {:type "password"
-                       :placeholder "Password"
-                       :value (.-password data)
-                       :onChange #(setData "password" (.. % -target -value))
-                       :maxWidth #js ["80%" "initial"]})
+             ($ FormControl
+                ($ FormLabel "Email")
+                ($ Input {:type "text"
+                          :placeholder "Email"
+                          :value (.-email data)
+                          :onChange #(setData "email" (.. % -target -value))
+                          :maxWidth #js ["80%" "initial"]}))
+             ($ FormControl
+                ($ FormLabel "Password")
+                ($ Input {:type "password"
+                          :placeholder "Password"
+                          :value (.-password data)
+                          :onChange #(setData "password" (.. % -target -value))
+                          :maxWidth #js ["80%" "initial"]}))
              ($ Button {:type "submit"
                         :colorScheme "blue"} "Submit")
              (when (not-empty errors)
