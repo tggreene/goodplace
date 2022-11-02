@@ -26,7 +26,7 @@
                     :href (routes/get-route-path :view-note {:note-id id})}
        ($ Flex {:direction "column"
                 :gap 1
-                :minWidth #js {:base "80vw"
+                :width #js {:base "80vw"
                                :lg "lg"}
                 :bg "gray.50"
                 :borderRadius 6
