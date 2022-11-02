@@ -3,6 +3,6 @@
  :builds
  {:node-test
   {:target :node-test
-   :output-to "out/node-tests.js"
+   :output-to "target/node-tests.js"
    :main goodplace.tests.runner/run-tests
    :autorun true}}}
