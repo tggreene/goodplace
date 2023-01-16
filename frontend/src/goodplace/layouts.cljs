@@ -108,8 +108,10 @@
                      :borderRightColor "gray.100"
                      :borderRightStyle "solid"
                      :boxShadow "xs"})}
-          (for [page pages]
-            ($ NavigationItem {:& page}))))))
+          (for [{:keys [id path name]} pages]
+            ($ NavigationItem {:key id
+                               :path path
+                               :name name}))))))
 
 (defnc Default
   [{:keys [pages children]}]

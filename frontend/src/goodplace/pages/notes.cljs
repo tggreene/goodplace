@@ -27,7 +27,7 @@
        ($ Flex {:direction "column"
                 :gap 1
                 :width #js {:base "80vw"
-                               :lg "lg"}
+                            :sm "lg"}
                 :bg "gray.50"
                 :borderRadius 6
                 :p 4}
