@@ -40,24 +40,27 @@
     :title "Users"
     :page? true
     :nav? true
-    :authenticated? true}
+    :roles #{"admin"}}
+
    {:id :edit-user
     :path "/users/:user-id/edit"
     :name "Edit User"
     :title "Edit User"
     :page? true
-    :authenticated? true}
+    :roles #{"admin"}}
+
    {:id :create-user
     :path "/create-user"
     :name "Create User"
     :title "Create User"
     :page? true
-    :authenticated? true}
+    :roles #{"admin"}}
+
    {:id :delete-user
     :path "/users/:user-id/delete"
     :name "Delete User"
     :title "Delete User"
-    :authenticated? true}
+    :roles #{"admin"}}
 
    ;; Notes
    {:id :notes
@@ -66,30 +69,34 @@
     :title "Notes"
     :page? true
     :nav? true
-    :authenticated? true}
+    :roles #{"user" "admin"}}
+
    {:id :view-note
     :path "/notes/:note-id"
     :name "View Note"
     :title "View Note"
     :page? true
-    :authenticated? true}
+    :roles #{"user" "admin"}}
+
    {:id :edit-note
     :path "/notes/:note-id/edit"
     :name "Edit Note"
     :title "Edit Note"
     :page? true
-    :authenticated? true}
+    :roles #{"user" "admin"}}
+
    {:id :create-note
     :path "/create-note"
     :name "Create Note"
     :title "Create Note"
     :page? true
-    :authenticated? true}
+    :roles #{"user" "admin"}}
+
    {:id :delete-note
     :path "/notes/:note-id/delete"
     :name "Delete Note"
     :title "Delete Note"
-    :authenticated? true}
+    :roles #{"user" "admin"}}
 
    ;; Cities
    {:id :cities
@@ -98,7 +105,16 @@
     :title "Cities"
     :page? true
     :nav? true
-    :authenticated? true}])
+    :roles #{"user" "admin"}}])
+
+(def landing-page :home)
+
+(defn user-home
+  [{:keys [role] :as user}]
+  (case role
+    "admin" :home
+    "user" :home
+    landing-page))
 
 (defn -index-by
   [f col]
@@ -141,21 +157,18 @@
   [path]
   (-find-first #(= path (:path %)) routes))
 
-(comment
-  (get-route-path :view-note)
-  (get-route-path :view-note {:note-id "abcdefg"})
-
-  (get-route :view-note {:note-id "abcdefg"})
-
-  (get-route-by-path "/")
-
-  )
-
 (defn check-routes
   [routes]
   (let [ids (map :id routes)
         unique? (= (count ids) (count (set ids)))]
     {:unique? unique?}))
+
+(defn filter-pages
+  [{{:keys [role]} :user} pages]
+  (->> pages
+       (filter :nav?)
+       (filter #(or (empty? (:roles %))
+                    (contains? (:roles %) role)))))
 
 (comment
   ;; Check ids are unique

@@ -72,7 +72,8 @@
                               {:store (cookie-store {:key cookie-store-secret})}]
                              wrap-flash
                              [bam/wrap-authentication backend]
-                             mw/wrap-auth
+                             mw/wrap-authentication-redirect
+                             mw/wrap-authorization
                              [mw/wrap-inertia-session context]
                              [inertia/wrap-inertia template asset-version]]}})
        (reitit.ring/routes

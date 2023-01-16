@@ -1,8 +1,16 @@
 (ns goodplace.middleware
   (:require [buddy.auth]
             [ring.util.response :as response]
+            [goodplace.handlers.common :as common]
             [goodplace.shared.routes :as routes]
             [goodplace.models.users :as users]))
+
+(defn get-session
+  [request]
+  (:session request))
+
+;; Authentication is redundant when all authenticated users have authorization
+;; priviledges but may still be a meaningful distinction for api requests
 
 (defn either-route-not-authn-or-authn-present?
   [route request]
@@ -10,7 +18,7 @@
       (and (:authenticated? route)
            (buddy.auth/authenticated? request))))
 
-(defn wrap-auth
+(defn wrap-authentication-redirect
   [handler]
   (fn [request]
     (let [uri (:uri request)
@@ -18,6 +26,20 @@
       (if (either-route-not-authn-or-authn-present? route request)
         (handler request)
         (response/redirect (routes/get-route-path :login))))))
+
+(defn wrap-authorization
+  "If a user lacks the required role for a route then redirect them back to
+  their home"
+  [handler]
+  (fn [{:keys [uri] :as request}]
+    (let [user (common/get-user request)
+          route (routes/get-route-by-path uri)
+          route-roles (:roles route)]
+      (if (or (not route-roles)
+              (and route-roles
+                   (contains? route-roles (:role user))))
+        (handler request)
+        (response/redirect (routes/get-route-path (routes/user-home user)))))))
 
 (defn wrap-inertia-session
   "If we have a user-id we should have the user but if something else goes wrong

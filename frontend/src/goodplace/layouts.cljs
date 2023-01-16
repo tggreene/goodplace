@@ -15,17 +15,18 @@
    [helix.core :refer [defnc $ <>]]
    [helix.hooks :as hooks]
    [goodplace.components :refer [ResponsiveIndicator]]
+   [goodplace.detect :as detect]
    [goodplace.shared.routes :as routes]
    [applied-science.js-interop :as j]
    [react :as react]
-   [goodplace.detect :as detect]))
+   [tggreene.inertia-cljs :as inertia-cljs]))
 
 (def top-bar-height 14)
 (def top-bar-height-var "var(--chakra-sizes-14)")
 
 (defnc UserMenu
   [{:keys [user] :as props}]
-  (let [{:keys [first_name last_name]} (j/lookup user)
+  (let [{:keys [first_name last_name]} user
         name (str first_name " " last_name)]
     ($ Menu
        ($ MenuButton {:as Button
@@ -90,7 +91,7 @@
 
 (defnc NavigationMenu
   [{:keys [user pages menuOpen]}]
-  (let [pages (filter-pages {:user user} pages)]
+  (let [pages (routes/filter-pages {:user #c user} pages)]
     ($ Slide {:direction "left"
               :in menuOpen
               :style #js {:left 0
@@ -115,11 +116,11 @@
 
 (defnc Default
   [{:keys [pages children]}]
-  (let [pageData (usePage)
+  (let [page (inertia-cljs/use-page)
         [menuOpen] (useLocalStorage "MenuOpen" false)
         setMenuOpen (fn [value]
                           (writeStorage "MenuOpen" value))
-        user (j/get-in pageData [:props :auth :user])]
+        user (get-in page [:props :auth :user])]
     ($ Flex {:direction "column"
              :justify "center"
              :align "center"
