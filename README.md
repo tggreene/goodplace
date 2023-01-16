@@ -66,11 +66,11 @@ There are some distinct types of route to be aware of within inertia:
 - [x] Improve documentation
   - [x] High Level Description
 - [x] Improve appearance of side menu
-- [ ] Import logging changes
-- [ ] Import database changes
+- [x] Import database changes
+- [x] Import logging changes
 - [ ] Import authorization changes
 - [ ] Import malli validation
-- [ ] Ensure we don't scrap the database on every reset
+- [x] Ensure we don't scrap the database on every reset
 - [ ] Create a dashboard-like page
 - [ ] Create a scaffolder for new routes
 - [ ] Create a generator that can produce copies of this app elsewhere
@@ -78,8 +78,5 @@ There are some distinct types of route to be aware of within inertia:
 - [ ] Improve usability
   - [ ] Out of the box run test
 - [ ] Add rationale for GoodPlace
-- [ ] Add authorization for routes
-- [ ] Do more to split development time dependencies
 - [ ] CI tests (Github Actions)
 - [ ] Add individual pages for server errors
-- [ ] Add components to wrap inertia links, buttons
