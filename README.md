@@ -38,6 +38,8 @@ There are some distinct types of route to be aware of within inertia:
     * For a route with no corresponding page you can add the handlers
 3) Inertia caches root components so you may need to refresh to see changes (correct me if I'm wrong)
 
+### Running capacitor
+
 ## Todo
 
 - [x] Add easy running of cljs, js parts
@@ -61,8 +63,17 @@ There are some distinct types of route to be aware of within inertia:
 - [x] CapacitorJS?
 - [x] Improve tests
 - [x] Reduce bulk of pages namespaces
-- [ ] Improve documentation
-  - [ ] High Level Description
+- [x] Improve documentation
+  - [x] High Level Description
+- [x] Improve appearance of side menu
+- [ ] Import logging changes
+- [ ] Import database changes
+- [ ] Import authorization changes
+- [ ] Import malli validation
+- [ ] Ensure we don't scrap the database on every reset
+- [ ] Create a dashboard-like page
+- [ ] Create a scaffolder for new routes
+- [ ] Create a generator that can produce copies of this app elsewhere
 - [ ] Improve build
 - [ ] Improve usability
   - [ ] Out of the box run test
@@ -70,6 +81,5 @@ There are some distinct types of route to be aware of within inertia:
 - [ ] Add authorization for routes
 - [ ] Do more to split development time dependencies
 - [ ] CI tests (Github Actions)
-- [ ] Improve appearance of side menu
 - [ ] Add individual pages for server errors
 - [ ] Add components to wrap inertia links, buttons
