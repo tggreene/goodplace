@@ -6,42 +6,6 @@
             [next.jdbc.sql :as sql]
             [goodplace.utils.coerce :as coerce]))
 
-(defn create-notes-table!
-  [db]
-  (jdbc/execute!
-   db
-   [(str "CREATE TABLE notes (\n"
-         "  id TEXT PRIMARY KEY,\n"
-         "  user INTEGER NOT NULL,\n"
-         "  title TEXT NOT NULL,\n"
-         "  contents TEXT NOT NULL,\n"
-         "  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
-         "  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
-         "  deleted_at DATETIME,\n"
-         "  FOREIGN KEY(user) REFERENCES user(id)"
-         ");")]))
-
-(defn create-notes-table-postgres!
-  [db]
-  (jdbc/execute!
-   db
-   [(str "CREATE TABLE notes (\n"
-         "  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n"
-         "  user_id INTEGER NOT NULL,\n"
-         "  title TEXT NOT NULL,\n"
-         "  contents TEXT NOT NULL,\n"
-         "  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n"
-         "  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n"
-         "  deleted_at TIMESTAMP,\n"
-         "  CONSTRAINT fk_user_id FOREIGN KEY(user_id) REFERENCES users(id)"
-         ");")]))
-
-(defn destroy-notes-table!
-  [db]
-  (jdbc/execute!
-   db
-   ["DROP TABLE notes;"]))
-
 (defn get-note-by-id
   [db note-id]
   (let [query (h/format {:select [:*]
@@ -83,7 +47,7 @@
   (let [query (h/format {:select [:*]
                          :from [:notes]
                          :where [:and
-                                 [:= :user_id (coerce/to-int user-id)]
+                                 [:= :user_id (coerce/to-uuid user-id)]
                                  [:= :deleted_at nil]]
                          :order-by [:created_at]})]
     (jdbc/execute! db query)))

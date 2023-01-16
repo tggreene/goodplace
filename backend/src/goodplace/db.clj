@@ -1,34 +1,32 @@
 (ns goodplace.db
-  (:require [integrant.core :as ig]
+  (:require [clojure.tools.logging :as log]
+            [integrant.core :as ig]
             [next.jdbc :as jdbc]
             [next.jdbc.result-set :as rs]
-            [clojure.tools.logging :as log]))
+            [hikari-cp.core :as hikari] ))
 
-(defmethod ig/init-key ::db
-  [_ {:keys [db-spec]}]
-  (println "Starting db")
-  (let [ds (jdbc/get-datasource db-spec)]
-    (jdbc/with-options ds {:builder-fn rs/as-unqualified-maps})))
+(defmethod ig/init-key ::pool
+  [_ {:keys [options]}]
+  (log/info "Creating" ::pool)
+  (hikari/make-datasource options))
 
-(defmethod ig/suspend-key! ::db
+(defmethod ig/suspend-key! ::pool
   [_ impl]
   impl)
 
-(defmethod ig/resume-key ::db
+(defmethod ig/resume-key ::pool
   [key opts old-opts old-impl]
   (if (= opts old-opts)
     old-impl
     (do (ig/halt-key! key old-impl)
         (ig/init-key key opts))))
 
-(defmethod ig/halt-key! ::db
-  [_ node]
-  (println "Stopping db (noop)")
-  nil)
+(defmethod ig/halt-key! ::pool
+  [_ datasource]
+  (log/info "Stopping" ::pool)
+  (hikari/close-datasource datasource))
 
 (defmethod ig/init-key ::postgres-client
-  [_ {:keys [db-spec]}]
-  (println "Creating postgres client")
-  (let [ds (jdbc/get-datasource db-spec)]
-    (jdbc/with-options ds {:builder-fn rs/as-unqualified-maps})))
-
+  [_ {:keys [datasource]}]
+  (log/info "Creating" ::postgres-client)
+  (jdbc/with-options datasource {:builder-fn rs/as-unqualified-maps}))

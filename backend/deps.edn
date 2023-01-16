@@ -1,10 +1,11 @@
 {:paths ["src" "resources"]
  :deps
  {org.clojure/clojure {:mvn/version "1.11.1"}
+  org.clojure/tools.logging {:mvn/version "1.1.0"}
   goodplace/shared {:local/root "../shared"}
   crypto-password/crypto-password {:mvn/version "0.3.0"}
-  com.github.tggreene/easy.builder {:local/root "../../easy.builder"}
-  com.github.tggreene/easy.system {:local/root "../../easy.system"}
+  com.github.tggreene/easy-system {:mvn/version "0.1.0"}
+  com.github.tggreene/easy-logging {:mvn/version "0.1.0"}
   ring/ring-jetty-adapter {:mvn/version "1.9.5"}
   ring/ring-core {:mvn/version "1.9.5"}
   ring/ring-devel {:mvn/version "1.9.5"}
@@ -21,27 +22,27 @@
                   :exclusions [org.clojure/clojurescript]}
   metosin/reitit {:mvn/version "0.5.18"}
   org.postgresql/postgresql {:mvn/version "42.5.0"}
-  prone/prone {:mvn/version "2021-04-23"}}
+  prone/prone {:mvn/version "2021-04-23"}
+  migratus/migratus {:mvn/version "1.4.5"}
+  hikari-cp/hikari-cp {:mvn/version "3.0.0"}}
 
  :aliases
  {:dev
-  {:extra-paths ["dev/src"]
+  {:extra-paths ["dev/src" "dev/resources"]
    :extra-deps {integrant/repl {:mvn/version "0.3.2"}
                 com.github.tggreene/integrant-repl-autoreload {:mvn/version "0.2.0"}
-                org.clojars.bigsy/pg-embedded-clj {:mvn/version "1.0.0"}
+                org.clojars.bigsy/pg-embedded-clj {:mvn/version "1.0.0"
+                                                   :exclusions [org.slf4j/slf4j-jdk14]}
                 io.zonky.test.postgres/embedded-postgres-binaries-linux-arm64v8 {:mvn/version "15.0.0"}}
-   ;; with auto-reset
-   :main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace.dev/go),(goodplace.dev/auto-reset)"]
-   ;; without auto-reset
-   ;;:main-opts ["-e" "(require 'goodplace.dev),(Thread/sleep 5000),(goodplace,dev/go)"]
-   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]}
+   :main-opts ["-e" "(require 'goodplace.dev),(goodplace.dev/init!)"]
+   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"
+              "-Dlogback.configurationFile=logback-dev.xml"]}
+
   :run {:main-opts ["-m" "goodplace.main"]}
+
   :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.303"}}
             :exec-fn hf.depstar/uberjar
             :exec-args {:aot true
                         :jar "target/goodplace.jar"
                         :main-class "goodplace.main"
-                        :sync-pom true}}}
- :easy.builder/meta
- {:ns-root goodplace
-  :main-ns goodplace.main}}
+                        :sync-pom true}}}}

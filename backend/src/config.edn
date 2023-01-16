@@ -1,4 +1,16 @@
-{:ig/system
+{:db #profile {:dev {:username "postgres"
+                     :password "postgres"
+                     :port-number 5432
+                     :server-name "localhost"}
+               :local {:username "postgres"
+                       :password "postgres"
+                       :port-number 5432
+                       :server-name "localhost"}
+               :prod {:username "postgres"
+                      :password #env DB_PASSWORD
+                      :port-number 5432
+                      :server-name "goodplace-db.internal"}}
+ :ig/system
  #merge
  [{:goodplace.main/server
    {:port #profile {:dev 8090
@@ -6,19 +18,34 @@
     :dynamic? #profile {:dev true
                         :default false}
     :postgres #ig/ref :goodplace.db/postgres-client}
+
+   :goodplace.db/pool
+   {:options #merge
+    [{:auto-commit true
+      :read-only false
+      :connection-timeout 30000
+      :validation-timeout 5000
+      :idle-timeout 600000
+      :max-lifetime 1800000
+      :minimum-idle 10
+      :maximum-pool-size 10
+      :pool-name "db-pool"
+      :adapter "postgresql"
+      :register-mbeans false}
+     #ref [:db]]}
+
    :goodplace.db/postgres-client
-   {:db-spec #profile {:dev {:dbtype "postgres"
-                             :user "postgres"
-                             :password "postgres"
-                             :port 5432}
-                       :prod {:dbtype "postgres"
-                              :user "postgres"
-                              :password #env DB_PASSWORD
-                              :port 5432
-                              :host "goodplace-db.internal"}}
-    :depends-on #profile {:dev #ig/ref :goodplace.dev.db/postgres-server
-                          :default nil}}
+   {:datasource #ig/ref :goodplace.db/pool}
+
    :goodplace.migrations/migrations
-   {:postgres #ig/ref :goodplace.db/postgres-client}}
-  #profile {:dev {:goodplace.dev.db/postgres-server nil}
+   {:store :database
+    :migration-dir "migrations"
+    :db {:datasource #ig/ref :goodplace.db/pool}}}
+
+  #profile {:dev {:goodplace.dev.migrations/migrations
+                  {:store :database
+                   :migration-dir "../dev/resources/dev-migrations"
+                   :migration-table-name "schema_migrations_dev"
+                   :db {:datasource #ig/ref :goodplace.db/pool}
+                   :depends-on #ig/ref :goodplace.migrations/migrations}}
             :default nil}]}

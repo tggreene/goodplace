@@ -2,7 +2,8 @@
   (:require [aero.core :as aero]
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :as bam]
-            [easy.system :as es]
+            [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
             [goodplace.handlers :refer [handlers]]
             [goodplace.middleware :as mw]
             [goodplace.models.users :as users]
@@ -10,8 +11,8 @@
             [goodplace.templates.app :refer [template]]
             [inertia.middleware :as inertia]
             [integrant.core :as ig]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :as log]
+            [jsonista.core :as json]
+            [prone.middleware :as prone]
             [reitit.coercion.schema :as schema-coercion]
             [reitit.dev.pretty :as pretty]
             [reitit.ring :as rr]
@@ -23,20 +24,8 @@
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.middleware.stacktrace :refer [wrap-stacktrace]]
-            [prone.middleware :as prone]
-            [jsonista.core :as json])
+            [tggreene.easy-system :as es])
   (:gen-class))
-
-(defn inertia-handler
-  ([id]
-   (fn [_]
-     (inertia/render id)))
-  ([id props]
-   (fn [_]
-     (inertia/render id props))))
-
-(comment
-  (inertia/render "something"))
 
 (defn check-handlers
   [handlers context]
