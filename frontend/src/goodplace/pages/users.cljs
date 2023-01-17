@@ -152,30 +152,17 @@
                                    (post (routes/get-route-path :create-user)))
                     :errors errors}))))
 
-(defn use-form
-  [initialData]
-  (let [uf (useForm (clj->js initialData))
-        set-data (.-setData uf)
-        transform (.-transform uf)]
-    (-> uf
-        (j/assoc! :data (->clj (.-data uf)))
-        (j/assoc! :setData #(set-data (name %1) %2))
-        (j/assoc! :errors (->clj (.-errors uf)))
-        (j/assoc! :transform #(transform (fn [data]
-                                           (->js (% (->clj data))))))
-        (j/lookup))))
-
 (defnc EditUser
   []
   (let [{:keys [id first_name last_name email password role]}
         (get-in (inertia-cljs/use-page) [:props :user])
         {:keys [data setData errors post processing transform] :as x}
-        (use-form {:first_name first_name
-                   :last_name last_name
-                   :email email
-                   :role role
-                   :password ""
-                   :password2 ""})]
+        (inertia-cljs/use-form {:first_name first_name
+                                :last_name last_name
+                                :email email
+                                :role role
+                                :password ""
+                                :password2 ""})]
     (transform (fn [data]
                  (cond-> data
                    (str/blank? (:password data)) (dissoc :password)
@@ -186,10 +173,3 @@
                     :onSubmit #(do (.preventDefault %)
                                    (post (routes/get-route-path :edit-user {:user-id id})))
                     :errors errors}))))
-
-
-(comment
-
-  (js-delete (j/obj :a 1) "a")
-
-  )
