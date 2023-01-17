@@ -3,7 +3,19 @@
             [goodplace.models.notes :as model]
             [goodplace.handlers.common :as common]
             [goodplace.shared.routes :as routes]
-            [ring.util.response :as response]))
+            [goodplace.utils.schema :as schema]
+            [ring.util.response :as response]
+            [goodplace.utils.coerce :as coerce]))
+
+(def note-schema
+  [:map
+   [:id {:optional true} :uuid]
+   [:user_id :uuid]
+   [:title schema/non-empty-string]
+   [:contents schema/non-empty-string]])
+
+(def validate-note
+  (schema/make-validator note-schema))
 
 (defn list-notes
   [{:keys [postgres]}]
@@ -52,14 +64,18 @@
   [{:keys [postgres]}]
   (fn [request]
     (let [user (common/get-user request)
-          note (:body-params request)
-          {:keys [id] :as new-note}
-          (model/create-note! postgres
-                              (assoc note :user_id (:id user)))
-          id (str id)]
-      (response/redirect
-       (routes/get-route-path :notes)
-       :see-other))))
+          note (-> (:body-params request)
+                   (assoc :user_id (coerce/to-uuid (:id user))))
+          errors (validate-note note)]
+      (if (empty? errors)
+        (let [{:keys [id] :as new-note}
+              (model/create-note! postgres note)
+              id (str id)]
+          (response/redirect
+           (routes/get-route-path :view-note {:note-id id})
+           :see-other))
+        (-> (response/redirect (routes/get-route-path :create-note))
+            (assoc :flash {:error errors}))))))
 
 (defn delete-note
   [{:keys [postgres]}]

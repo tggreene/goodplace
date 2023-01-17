@@ -2,11 +2,11 @@
   (:require [goodplace.handlers.common :as common]
             [goodplace.models.users :as model]
             [goodplace.shared.routes :as routes]
+            [goodplace.utils.coerce :as coerce]
             [goodplace.utils.pagination :as pagination]
             [goodplace.utils.schema :as schema]
             [inertia.middleware :as inertia]
             [ring.util.response :as response]
-            [goodplace.utils.coerce :as coerce]
             [malli.util :as mu]))
 
 (def user-schema

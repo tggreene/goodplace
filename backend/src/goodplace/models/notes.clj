@@ -17,8 +17,7 @@
 
 (defn create-note!
   [db note]
-  (let [note (update note :user_id coerce/to-int)
-        query (h/format {:insert-into :notes
+  (let [query (h/format {:insert-into :notes
                          :values [note]
                          :returning [:id]
                          :on-conflict [:id]

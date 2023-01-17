@@ -2,8 +2,8 @@
   (:require
    ["@chakra-ui/react"
     :refer
-    [Box Flex Heading Button Text Input HStack Toast FormControl FormLabel
-     Textarea]]
+    [Box Flex Heading Button Text Input HStack Toast FormControl
+    FormErrorMessage FormLabel Textarea]]
    ["@inertiajs/inertia-react" :refer [InertiaLink]]
    [helix.core :refer [defnc $ <>]]
    [goodplace.pages.common :refer [PageTemplate]]
@@ -67,6 +67,36 @@
                           :method "delete"}
              ($ Button {:colorScheme "red"} "Delete Note"))))))
 
+(defnc NoteForm
+  [{:keys [data setData onSubmit errors buttons]}]
+  ($ "form" {:onSubmit onSubmit}
+    ($ Flex {:direction "column"
+             :gap 4
+             :width #js {:base "75vw"
+                         :lg "lg"}
+             :p 4}
+      ($ FormControl {:isInvalid (contains? errors :title)}
+        ($ FormLabel "Title")
+        ($ Input {:type "text"
+                  :value (:title data)
+                  :placeholder "Title"
+                  :onChange #(setData :title (.. % -target -value))})
+        ($ FormErrorMessage (:title errors)) )
+      ($ FormControl {:isInvalid (contains? errors :contents)}
+        ($ FormLabel "Contents")
+        ($ Textarea {:type "text"
+                     :placeholder "Contents"
+                     :value (:contents data)
+                     :onChange #(setData :contents (.. % -target -value))
+                     :height "md"})
+        ($ FormErrorMessage (:contents errors)))
+      ($ HStack {:mt 4
+                 :justifyContent "center"}
+        buttons
+        ($ Button {:type "submit"
+                   :colorScheme "blue"}
+          "Submit"))) ))
+
 (defnc EditNote
   []
   (let [{:keys [id title contents] :as note}
@@ -104,6 +134,7 @@
                         :colorScheme "blue"}
                 "Submit"))))))
 
+#_
 (defnc CreateNote
   []
   (let [{:keys [data setData errors post processing]}
@@ -134,3 +165,18 @@
              ($ Button {:type "submit"
                         :colorScheme "blue"}
                 "Submit"))))))
+
+(defnc CreateNote
+  []
+  (let [{:keys [data setData errors post processing]}
+        (inertia-cljs/use-form {:title ""
+                                :contents ""})]
+    ($ PageTemplate {:title "Create Note"}
+      ($ NoteForm {:data data
+                   :setData setData
+                   :onSubmit
+                   #(do (.preventDefault %)
+                        (post (routes/get-route-path :create-note)))
+                   :errors errors
+                   :buttons [($ InertiaLink {:href (routes/get-route-path :notes)}
+                               ($ Button "Back To Notes"))]}))))
