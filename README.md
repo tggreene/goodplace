@@ -67,10 +67,11 @@ There are some distinct types of route to be aware of within inertia:
   - [x] High Level Description
 - [x] Improve appearance of side menu
 - [x] Import database changes
-- [x] Import logging changes
-- [ ] Import authorization changes
-- [ ] Import malli validation
 - [x] Ensure we don't scrap the database on every reset
+- [x] Import logging changes
+- [x] Import authorization changes
+- [x] Import malli validation
+- [x] Maybe fix hotloading?
 - [ ] Create a dashboard-like page
 - [ ] Create a scaffolder for new routes
 - [ ] Create a generator that can produce copies of this app elsewhere
