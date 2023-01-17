@@ -2,14 +2,18 @@
   (:require
    ["@chakra-ui/react"
     :refer
-    [Box Flex Button Container Text Input Table Thead Tbody Tr Th Td
-     TableContainer Stack HStack VStack FormControl FormLabel Textarea]]
-   ["@inertiajs/inertia-react" :refer [InertiaLink]]
+    [Box Flex Button Container FormControl FormLabel FormErrorMessage HStack
+     Input Select Stack Table TableContainer Text Textarea Thead Tbody Td Th Tr
+     VStack]]
+   ["@inertiajs/inertia-react" :refer [InertiaLink useForm]]
+   [applied-science.js-interop :as j]
    [helix.core :refer [defnc $ <>]]
    [helix.hooks :as hooks]
    [goodplace.pages.common :refer [PageTemplate]]
    [goodplace.shared.routes :as routes]
-   [tggreene.inertia-cljs :as inertia-cljs]))
+   [tggreene.inertia-cljs :as inertia-cljs]
+   [clojure.string :as str]
+   [cljs-bean.core :refer [->clj ->js]]))
 
 (defnc UsersTable
   [{:keys [users]}]
@@ -78,65 +82,69 @@
 
 (defnc UserForm
   [{:keys [data setData onSubmit errors]}]
-  ($ "form" {:onSubmit onSubmit}
+  ($ "form" {:onSubmit onSubmit
+             :autoComplete "off"}
      ($ Flex {:direction "column"
               :gap 4
               :width #js {:base "80vw"
                           :lg "2xl"}
               :p 4}
-        ($ FormControl
-           ($ FormLabel "First Name")
-           ($ Input {:type "text"
-                     :value (:first_name data)
-                     :onChange #(setData :first_name (.. % -target -value))}))
-        ($ FormControl
-           ($ FormLabel "Last Name")
-           ($ Input {:type "text"
-                     :value (:last_name data)
-                     :onChange #(setData :last_name (.. % -target -value))}))
-        ($ FormControl
-           ($ FormLabel "Username")
-           ($ Input {:type "text"
-                     :value (:username data)
-                     :onChange #(setData :username (.. % -target -value))}))
-        ($ FormControl
-           ($ FormLabel "Email")
-           ($ Input {:type "text"
-                     :value (:email data)
-                     :onChange #(setData :email (.. % -target -value))}))
-        ($ FormControl
-           ($ FormLabel "Password")
-           ($ Input {:type "password"
-                     :value (:password data)
-                     :onChange #(setData :password (.. % -target -value))}))
-        ($ FormControl
-           ($ FormLabel "Re-type Password")
-           ($ Input {:type "password"
-                     :value (:password2 data)
-                     :onChange #(setData :password2 (.. % -target -value))}))
-        (when (not-empty errors)
-          ($ Box {:p 4
-                  :bg "red.50"
-                  :borderRadius 6
-                  :minWidth "md"}
-             (for [error (vals errors)]
-               ($ Text {:color "red.500"} error))))
-        ($ HStack {:mt 4}
-           ($ InertiaLink {:href (routes/get-route-path :users)}
-              ($ Button "Back To Users"))
-           ($ Button {:type "submit"
-                      :colorScheme "blue"}
-              "Submit")))) )
+       ($ FormControl {:isInvalid (contains? errors :first_name)}
+         ($ FormLabel "First Name")
+         ($ Input {:type "text"
+                   :value (:first_name data)
+                   :onChange #(setData :first_name (.. % -target -value))})
+         ($ FormErrorMessage (:first_name errors)))
+       ($ FormControl {:isInvalid (contains? errors :last_name)}
+         ($ FormLabel "Last Name")
+         ($ Input {:type "text"
+                   :value (:last_name data)
+                   :onChange #(setData :last_name (.. % -target -value))})
+         ($ FormErrorMessage (:last_name errors)))
+       ($ FormControl {:isInvalid (contains? errors :email)}
+         ($ FormLabel "Email")
+         ($ Input {:type "text"
+                   :value (:email data)
+                   :onChange #(setData :email (.. % -target -value))})
+
+         ($ FormErrorMessage (:email errors)))
+       ($ FormControl {:isInvalid (contains? errors :role)}
+         ($ FormLabel "Role")
+         ($ Select {:value (:role data)
+                    :onChange #(setData :role (.. % -target -value))
+                    :placeholder "Select Role"}
+           ($ "option" {:value "user"} "User")
+           ($ "option" {:value "admin"} "Admin"))
+         ($ FormErrorMessage (:role errors)))
+       ($ FormControl {:isInvalid (contains? errors :password)}
+         ($ FormLabel "Password")
+         ($ Input {:type "password"
+                   :value (:password data)
+                   :onChange #(setData :password (.. % -target -value))})
+         ($ FormErrorMessage (:password errors)))
+       ($ FormControl {:isInvalid (contains? errors :password2)}
+         ($ FormLabel "Re-type Password")
+         ($ Input {:type "password"
+                   :value (:password2 data)
+                   :autoComplete "new-password"
+                   :onChange #(setData :password2 (.. % -target -value))})
+         ($ FormErrorMessage (:password2 errors)))
+       ($ HStack {:mt 4}
+         ($ InertiaLink {:href (routes/get-route-path :users)}
+           ($ Button "Back To Users"))
+         ($ Button {:type "submit"
+                    :colorScheme "blue"}
+           "Submit")))) )
 
 (defnc CreateUser
   []
   (let [{:keys [data setData errors post processing]}
         (inertia-cljs/use-form {:first_name ""
                                 :last_name ""
-                                :username ""
                                 :email ""
                                 :password ""
-                                :password2 ""})]
+                                :password2 ""
+                                :role ""})]
     ($ PageTemplate {:title "Create User"}
        ($ UserForm {:data data
                     :setData setData
@@ -144,20 +152,44 @@
                                    (post (routes/get-route-path :create-user)))
                     :errors errors}))))
 
+(defn use-form
+  [initialData]
+  (let [uf (useForm (clj->js initialData))
+        set-data (.-setData uf)
+        transform (.-transform uf)]
+    (-> uf
+        (j/assoc! :data (->clj (.-data uf)))
+        (j/assoc! :setData #(set-data (name %1) %2))
+        (j/assoc! :errors (->clj (.-errors uf)))
+        (j/assoc! :transform #(transform (fn [data]
+                                           (->js (% (->clj data))))))
+        (j/lookup))))
+
 (defnc EditUser
   []
-  (let [{:keys [id first_name last_name username email password]}
+  (let [{:keys [id first_name last_name email password role]}
         (get-in (inertia-cljs/use-page) [:props :user])
-        {:keys [data setData errors post processing]}
-        (inertia-cljs/use-form {:first_name first_name
-                                :last_name last_name
-                                :username username
-                                :email email
-                                :password ""
-                                :password2 ""})]
+        {:keys [data setData errors post processing transform] :as x}
+        (use-form {:first_name first_name
+                   :last_name last_name
+                   :email email
+                   :role role
+                   :password ""
+                   :password2 ""})]
+    (transform (fn [data]
+                 (cond-> data
+                   (str/blank? (:password data)) (dissoc :password)
+                   (str/blank? (:password2 data)) (dissoc :password2))))
     ($ PageTemplate {:title "Edit User"}
        ($ UserForm {:data data
                     :setData setData
                     :onSubmit #(do (.preventDefault %)
                                    (post (routes/get-route-path :edit-user {:user-id id})))
                     :errors errors}))))
+
+
+(comment
+
+  (js-delete (j/obj :a 1) "a")
+
+  )

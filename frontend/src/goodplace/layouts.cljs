@@ -91,7 +91,7 @@
 
 (defnc NavigationMenu
   [{:keys [user pages menuOpen]}]
-  (let [pages (routes/filter-pages {:user #c user} pages)]
+  (let [pages (routes/filter-pages {:user user} pages)]
     ($ Slide {:direction "left"
               :in menuOpen
               :style #js {:left 0
