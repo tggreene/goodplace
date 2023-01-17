@@ -12,37 +12,35 @@
    [clojure.walk :as walk]
    [potpuri.core :as potpuri]))
 
-(def pages
-  (reduce (fn [pages {:keys [id] :as page}]
-            (conj pages
-                  (if-let [impl (get page-components id)]
-                    (assoc page :impl impl)
-                    page)))
-          []
-          routes/pages))
-
-(def indexed-pages
-  (potpuri/index-by :id pages))
-
 (defn check-page-components!
   []
-  (->> pages
+  (->> routes/pages
+       (reduce (fn [pages {:keys [id] :as page}]
+                 (conj pages
+                       (if-let [impl (get page-components id)]
+                         (assoc page :impl impl)
+                         page)))
+               [])
        (remove :impl)
        (run! #(js/console.warn (str "No page component for " (:id %))))))
 
 (defn setup-inertia
   []
   (inertia-cljs/simple-inertia-app
-   {:page-fn #(get-in indexed-pages [(keyword %) :impl])
+   {:page-fn #(get page-components (keyword %))
     :title-fn #(str % " - GoodPlace")
     :layout-component layouts/Default
-    :layout-props {:pages pages}
+    :layout-props {:pages routes/pages}
     :root-component ChakraProvider
+    :root-props {}
     :react-root-renderer inertia-cljs-react/renderer}))
 
-(defn start!
+(defn init!
   []
   (check-page-components!)
   (setup-inertia))
 
-(start!)
+(defn ^:dev/after-load reload
+  []
+  (println "this is run")
+  (.reload Inertia))

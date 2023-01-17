@@ -71,13 +71,6 @@
                           :data-test "login"}
                   name)))))))
 
-(defn filter-pages
-  [{:keys [user]} pages]
-  (cond->> pages
-    :always (filter :nav?)
-    user (remove #(= :login (:id %)))
-    (not user) (remove :authenticated?)))
-
 (defnc NavigationItem
   [{:keys [path name]}]
   ($ InertiaLink {:as "span"
@@ -91,28 +84,27 @@
 
 (defnc NavigationMenu
   [{:keys [user pages menuOpen]}]
-  (let [pages (routes/filter-pages {:user user} pages)]
-    ($ Slide {:direction "left"
-              :in menuOpen
-              :style #js {:left 0
-                          :top top-bar-height-var
-                          :width "var(--chakra-sizes-xs)"
-                          :height "max(100%, 100vh)"
-                          :position "absolute"
-                          :zIndex 10}}
-       ($ Flex {:height "max(100%, 100vh)"
-                :width "xs"
-                :bg "white"
-                :direction "column"
-                & (when menuOpen
-                    {:borderRightWidth 1
-                     :borderRightColor "gray.100"
-                     :borderRightStyle "solid"
-                     :boxShadow "xs"})}
-          (for [{:keys [id path name]} pages]
-            ($ NavigationItem {:key id
-                               :path path
-                               :name name}))))))
+  ($ Slide {:direction "left"
+            :in menuOpen
+            :style #js {:left 0
+                        :top top-bar-height-var
+                        :width "var(--chakra-sizes-xs)"
+                        :height "max(100%, 100vh)"
+                        :position "absolute"
+                        :zIndex 10}}
+    ($ Flex {:height "max(100%, 100vh)"
+             :width "xs"
+             :bg "white"
+             :direction "column"
+             & (when menuOpen
+                 {:borderRightWidth 1
+                  :borderRightColor "gray.100"
+                  :borderRightStyle "solid"
+                  :boxShadow "xs"})}
+      (for [{:keys [id path name]} pages]
+        ($ NavigationItem {:key id
+                           :path path
+                           :name name})))))
 
 (defnc Default
   [{:keys [pages children]}]
@@ -132,7 +124,7 @@
                   :menuOpen menuOpen})
        ($ Flex {:direction "row"}
           ($ NavigationMenu {:user user
-                             :pages pages
+                             :pages (routes/filter-pages {:user user} pages)
                              :menuOpen menuOpen})
           ($ Box {:py 8
                   :px 8

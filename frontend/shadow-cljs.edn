@@ -4,7 +4,7 @@
 
  :builds
  {:app {:target :browser
-        :modules {:app {:entries [goodplace.app]}}
+        :modules {:app {:init-fn goodplace.app/init!}}
         :fs-watch {:hawk false}
 
         :dev {:output-dir "public/js"
