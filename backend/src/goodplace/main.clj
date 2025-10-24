@@ -46,7 +46,7 @@
           routes))
 
 (def not-found-inertia
-  (-> (fn [request]
+  (-> (fn [_request]
         (inertia/render :something-wrong
                         {:errors ["Page not found"]
                          :redirect (routes/get-route-path :home)}))
@@ -57,7 +57,7 @@
 
 (defn handler
   [context]
-  (-> (reitit.ring/ring-handler
+  (reitit.ring/ring-handler
        (reitit.ring/router
         (create-reitit-routes routes/routes (handlers context))
         {:conflicts nil
@@ -81,19 +81,17 @@
                                           ;; :root "public-prod"
                                           :path "/"})
         (reitit.ring/create-default-handler
-         {:not-found not-found-inertia})))
-      ;; Prone must be a top level middleware
-      (prone/wrap-exceptions {:app-namespaces ['goodplace]})))
+         {:not-found not-found-inertia}))))
 
 (defmethod ig/init-key ::server
-  [_ {:keys [port dynamic? postgres] :as opts}]
+  [_ {:keys [port dynamic? postgres] :as _opts}]
   (log/infof "Starting Server {port: %d}" port)
   (let [context {:postgres postgres}]
     (check-handlers handlers context)
     (jetty/run-jetty
      (if dynamic?
-       (fn [request]
-         ((handler context) request))
+       (-> (handler context)
+           (prone/wrap-exceptions {:app-namespaces ['goodplace]}))
        (handler context))
      {:port port
       :join? false
@@ -107,12 +105,12 @@
 (def system nil)
 
 (defn log-config
-  [system-config]
+  [_system-config]
   nil)
 
 (def uncaught-exception-handler
   (reify Thread$UncaughtExceptionHandler
-    (uncaughtException [_ thread throwable]
+    (uncaughtException [_ _thread throwable]
       (log/fatal throwable "Shutting down service with Exception")
       (ig/halt! system))))
 
