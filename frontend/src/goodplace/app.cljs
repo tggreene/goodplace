@@ -42,5 +42,4 @@
 
 (defn ^:dev/after-load reload
   []
-  (println "this is run")
   (.reload Inertia))
