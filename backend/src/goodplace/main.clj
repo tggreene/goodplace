@@ -95,7 +95,10 @@
        (fn [request]
          ((handler context) request))
        (handler context))
-     {:port port :join? false})))
+     {:port port
+      :join? false
+      :min-threads 2
+      :max-threads 16})))
 
 (defmethod ig/halt-key! ::server [_ server]
   (when server
